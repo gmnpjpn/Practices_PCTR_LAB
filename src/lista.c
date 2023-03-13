@@ -49,10 +49,10 @@ void insertarFinal(TLista *pLista, int valor)
   nuevoNodo->pSiguiente = NULL;
 
   // Ahora empieza a evaluar posibles situaciones
-  if(pLista->pPrimero = NULL){  // Si la lista esta vacia, el nuevo nodo, se convierte en el primero
-    pLista->pPrimero == nuevoNodo;
+  if(pLista->pPrimero == NULL){  // Si la lista esta vacia, el nuevo nodo se convierte en el primero
+    pLista->pPrimero = nuevoNodo;
   
-  } else {  // Si la lista no está vacía
+  } else {  // Si la lista no está vacía, creo ultimoNodo que avanza hasta el final y hago que apunte a nuevoNodo
     TNodo *ultimoNodo = pLista->pPrimero;
 
     while (ultimoNodo->pSiguiente != NULL)
