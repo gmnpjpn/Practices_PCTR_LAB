@@ -14,10 +14,15 @@ int main(int argc, char *argv[])
 
   insertar(pLista, 2);
   insertarFinal(pLista, 34);
+  insertarN(pLista, 1, 100);
+  eliminar(pLista);
+  eliminarN(pLista, 0);
 
   imprimir(pLista);
 
   longitud(pLista);
+  getElementoN(pLista, 0);
+
 
   destruir(pLista);
 
