@@ -153,12 +153,14 @@ int getElementoN(TLista *pLista, int index)
     TNodo *nodoActual = pLista->pPrimero;
     int i;
 
-    for (i = 0; i < index && nodoActual != NULL; i++)
+    for (i = 0; i < index && nodoActual != NULL; i++) //En el caso de que el index no exista quitar algo da problemas
     {
       nodoActual = nodoActual->pSiguiente;
     }
 
-    if (i == index && nodoActual != NULL)
+    // Modificacion del if sugerida por Jesus
+    // if (i == index && nodoActual != NULL)
+    if (i == index)
     {
       printf("El elemento %d de la lista es: %d\n", index, nodoActual->valor);
       return nodoActual->valor;
