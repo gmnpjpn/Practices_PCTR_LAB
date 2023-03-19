@@ -8,6 +8,7 @@
 #include <sys/types.h>
 #include <unistd.h>
 #include <definitions.h>
+#include <lista.h>    //Add that to use the type "TLista"
 
 void procesar_argumentos(int argc, char *argv[], char **filename, char **pattern, int *lines);
 void instalar_manejador_senhal();
