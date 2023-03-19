@@ -8,7 +8,7 @@
 #include <sys/types.h>
 #include <unistd.h>
 #include <definitions.h>
-#include <lista.h>    //Add that to use the type "TLista"
+#include <lista.h>    //Added that to use the type "TLista"
 
 void procesar_argumentos(int argc, char *argv[], char **filename, char **pattern, int *lines);
 void instalar_manejador_senhal();
@@ -23,22 +23,22 @@ void esperar_procesos();
 void terminar_procesos(void);
 void liberar_recursos();
 
-int g_nProcesses;
-struct TProcess_t *g_process_table;
-TLista *patrones;
+int g_nProcesses; // Number of processes (???)
+struct TProcess_t *g_process_table; // Table with PIDs (???)
+TLista *patrones; // It creates a TLista called "patrones"
 
 int main(int argc, char *argv[])
 {
-  char *nombre_fichero = NULL, *fichero_patrones = NULL;
+  char *nombre_fichero = NULL, *fichero_patrones = NULL; // It initialize "nombre_fichero" and "fichero_patrones" char pointers to NULL
   int lineas = 0;
-  patrones = malloc(sizeof(TLista));
+  patrones = malloc(sizeof(TLista));  // It reserves a memory space for "patrones" with malloc()
 
-  crear(patrones, "PATRONES");
+  crear(patrones, "PATRONES");  // It cr
   procesar_argumentos(argc, argv, &nombre_fichero, &fichero_patrones, &lineas);
   instalar_manejador_senhal();
   procesar_patrones(fichero_patrones);
   iniciar_tabla_procesos(lineas, longitud(patrones) - 1);
-  crear_procesos(nombre_fichero);
+  crear_procesos(nombre_fichero); // It enters to "crear_procesos" method
   esperar_procesos();
 
   printf("\n[MANAGER] Terminacion del programa (todos los procesos terminados).\n");
@@ -67,11 +67,11 @@ void procesar_argumentos(int argc, char *argv[], char **nombrefichero, char **fi
     exit(EXIT_FAILURE);
   }
 
-  while ((ch = fgetc(fp)) != EOF)
+  while ((ch = fgetc(fp)) != EOF) //It reads a file until EOF
   {
     if (ch == '\n')
     {
-      ++*lineas;
+      ++*lineas;  // Every time it finds an "/n" do ++ on *lineas (???, I don't understand it very well. Why a pointer?)
     }
   }
 
@@ -149,7 +149,7 @@ void crear_procesos(const char *nombre_fichero)
     exit(EXIT_FAILURE);
   }
 
-  while (fgets(linea, sizeof(linea), fp) != NULL)
+  while (fgets(linea, sizeof(linea), fp) != NULL) //That reads "linea" from 0 to it's length and compare it to !Null
   {
     sprintf(numero_linea_str, "%d", indice_tabla);
     lanzar_proceso_contador(indice_tabla, linea, numero_linea_str);

@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <lista.h>
 
-// Crea una lista con un nodo.
+// Aniade un elemento a la primera posicion de la lista que recibe como parametro.
 void crear(TLista *pLista, char * valor)
 {
   pLista->pPrimero = malloc(sizeof(TNodo));

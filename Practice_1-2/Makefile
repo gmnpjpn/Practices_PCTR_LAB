@@ -3,7 +3,7 @@ DIREXE := exec/
 DIRHEA := include/
 DIRSRC := src/
 
-CFLAGS := -I$(DIRHEA) -c -Wall 
+CFLAGS := -I$(DIRHEA) -c -g -Wall -ggdb
 LDLIBS := -lpthread -lrt
 CC := gcc
 
