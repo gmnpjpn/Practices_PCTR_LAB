@@ -9,18 +9,18 @@
 #include <unistd.h>
 #include <definitions.h>
 
-void procesar_argumentos(int argc, char *argv[], char **filename, char **pattern, int *lines);  // Controla que los argumentos sean correctos y cuenta lineas del fichero principal
-void instalar_manejador_senhal(); // Crea un manejador de señal para la señal SIGINT (Ctrl + c), si hay algun error finaliza la ejecucion
+void procesar_argumentos(int argc, char *argv[], char **filename, char **pattern, int *lines);
+void instalar_manejador_senhal();
 void manejador_senhal(int sign);  // Termina los procesos y libera la memoria
 void procesar_patrones(const char *fichero_patrones); // Comprueba que el fichero de patrones sea accesible
-void procesar_linea(char *linea); // Procesa los patrones y los aniade en una lista enlazada
+void procesar_linea(char *linea); // Corta cada patron y lo aniade en una lista enlazada
 void iniciar_tabla_procesos(int n_procesos_contador, int n_procesos_procesador);  // Se crea una tabla que almacenara los PIDs de la cantidad necesaria de procesos
 void crear_procesos(const char *nombre_fichero);  // Se cuenta el numero de concidencias por linea, se imprime y se aniaden los procesos a la tabla
-void lanzar_proceso_contador(const int indice_tabla, const char *linea, const char *numero_linea_str);
-void lanzar_proceso_procesador(const int indice_tabla, const char *patron, const char *nombre_fichero);
-void esperar_procesos();
-void terminar_procesos(void);
-void liberar_recursos();
+void lanzar_proceso_contador(const int indice_tabla, const char *linea, const char *numero_linea_str);  // Creacion de procesos que cuentan las coincidencias
+void lanzar_proceso_procesador(const int indice_tabla, const char *patron, const char *nombre_fichero); // Lanza procesos hijo de los que luego almacenará su ID y clase en la tabla 
+void esperar_procesos();  // Espera a que terminen los procesos para eliminarlos de la tabla
+void terminar_procesos(void); // Termina procesos mediante kill()
+void liberar_recursos();  // Se liberan los recursos destinados a la tabla y a los patrones
 
 int g_nProcesses;
 struct TProcess_t *g_process_table;
@@ -28,25 +28,32 @@ TLista *patrones;
 
 int main(int argc, char *argv[])
 {
-  char *nombre_fichero = NULL, *fichero_patrones = NULL;
+  char *nombre_fichero = NULL, *fichero_patrones = NULL;  // Inicializa las variables de los ficheros a NULL
   int lineas = 0;
-  patrones = malloc(sizeof(TLista));
+  patrones = malloc(sizeof(TLista));  // Reserva espacio en memoria para la lista de patrones
 
-  crear(patrones, "PATRONES");
-  procesar_argumentos(argc, argv, &nombre_fichero, &fichero_patrones, &lineas);
-  instalar_manejador_senhal();
-  procesar_patrones(fichero_patrones);
-  iniciar_tabla_procesos(lineas, longitud(patrones) - 1);
-  crear_procesos(nombre_fichero);
-  esperar_procesos();
+  crear(patrones, "PATRONES");  // Crea una lista enlazada en la que el primero elemento contiene el valor "PATRONES"
 
-  printf("\n[MANAGER] Terminacion del programa (todos los procesos terminados).\n");
-  liberar_recursos();
+  procesar_argumentos(argc, argv, &nombre_fichero, &fichero_patrones, &lineas); // Controla que los argumentos sean correctos y cuenta lineas del fichero principal
+
+  instalar_manejador_senhal();  // Crea un manejador de señal para la señal SIGINT (Ctrl + c), si hay algun error finaliza la ejecucion
+
+  procesar_patrones(fichero_patrones);  // Comprueba que el fichero de patrones sea accesible
+
+  iniciar_tabla_procesos(lineas, longitud(patrones) - 1); // Se crea una tabla que almacenara los PIDs de la cantidad necesaria de procesos
+
+  crear_procesos(nombre_fichero); // Se cuenta el numero de concidencias por linea, se imprime y se aniaden los procesos a la tabla
+
+  esperar_procesos(); // Espera a que terminen los procesos para eliminarlos de la tabla
+
+  printf("\n[MANAGER] Terminacion del programa (todos los procesos terminados).\n");  // Mensaje de despedida
+
+  liberar_recursos(); // Se liberan los recursos destinados a la tabla y a los patrones
 
   return EXIT_SUCCESS;
 }
 
-void procesar_argumentos(int argc, char *argv[], char **nombrefichero, char **fichero_patrones, int *lineas)
+void procesar_argumentos(int argc, char *argv[], char **nombrefichero, char **fichero_patrones, int *lineas)  // Controla que los argumentos sean correctos y cuenta lineas del fichero principal
 {
   FILE *fp;
   int ch;
@@ -77,7 +84,7 @@ void procesar_argumentos(int argc, char *argv[], char **nombrefichero, char **fi
   fclose(fp);
 }
 
-void instalar_manejador_senhal()
+void instalar_manejador_senhal()  // Crea un manejador de señal para la señal SIGINT (Ctrl + c), si hay algun error finaliza la ejecucion
 {
   if (signal(SIGINT, manejador_senhal) == SIG_ERR)
   {
@@ -86,7 +93,7 @@ void instalar_manejador_senhal()
   }
 }
 
-void manejador_senhal(int sign)
+void manejador_senhal(int sign) // Termina los procesos y libera la memoria
 {
   printf("\n[MANAGER] Terminacion del programa (Ctrl + C).\n");
   terminar_procesos();
@@ -94,7 +101,7 @@ void manejador_senhal(int sign)
   exit(EXIT_SUCCESS);
 }
 
-void procesar_patrones(const char *fichero_patrones)
+void procesar_patrones(const char *fichero_patrones)  // Comprueba que el fichero de patrones sea accesible
 {
   FILE *fp;
   char linea[PATH_MAX];
@@ -130,7 +137,8 @@ void procesar_linea(char *linea)  // Corta cada patron a buscar y lo inserta en 
   
 }
 
-void iniciar_tabla_procesos(int n_procesos_contador, int n_procesos_procesador) // Recibe esos enteros como parametros para saber cuanta memoria asignar a la tabla
+void iniciar_tabla_procesos(int n_procesos_contador, int n_procesos_procesador) // Se crea una tabla que almacenara los PIDs de la cantidad necesaria de procesos
+                                                                                // Recibe esos enteros como parametros para saber cuanta memoria asignar a la tabla
 {
   g_nProcesses = n_procesos_contador + n_procesos_procesador;  // Total de procesos
   g_process_table = malloc(g_nProcesses * sizeof(struct TProcess_t)); // Asignacion de memoria para la tabla
@@ -178,7 +186,7 @@ void crear_procesos(const char *nombre_fichero) // Se lanza un proceso contador 
   fclose(fp);
 }
 
-void lanzar_proceso_contador(const int indice_tabla, const char *linea, const char *numero_linea_str)
+void lanzar_proceso_contador(const int indice_tabla, const char *linea, const char *numero_linea_str) // Creacion de procesos que cuentan las coincidencias
 {
   pid_t pid;
 
@@ -202,7 +210,7 @@ void lanzar_proceso_contador(const int indice_tabla, const char *linea, const ch
   strcpy(g_process_table[indice_tabla].clase , CLASE_CONTADOR);
 }
 
-void lanzar_proceso_procesador(const int indice_tabla, const char *patron, const char *nombre_fichero)
+void lanzar_proceso_procesador(const int indice_tabla, const char *patron, const char *nombre_fichero)  // Lanza procesos hijo de los que luego almacenará su ID y clase en la tabla 
 {
   pid_t pid;
 
@@ -225,7 +233,7 @@ void lanzar_proceso_procesador(const int indice_tabla, const char *patron, const
   strcpy(g_process_table[indice_tabla].clase , CLASE_PROCESADOR);
 }
 
-void esperar_procesos()
+void esperar_procesos() // Espera a que terminen los procesos para eliminarlos de la tabla
 {
   int i, n_processes = g_nProcesses;
   pid_t pid;
@@ -246,13 +254,13 @@ void esperar_procesos()
   }
 }
 
-void liberar_recursos()
+void liberar_recursos() // Se liberan los recursos destinados a la tabla y a los patrones
 {
   free(g_process_table);
   destruir(patrones);
 }
 
-void terminar_procesos(void)
+void terminar_procesos(void)  // Termina procesos mediante kill()
 {
   int i;
 
