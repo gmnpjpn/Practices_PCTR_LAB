@@ -157,7 +157,7 @@ void crear_procesos(const char *nombre_fichero)
     indice_tabla++;
   }
 
-  for (int i = 2; i <= longitud(patrones); i++)
+  for (int i = 2; i < longitud(patrones); i++)
   {
     lanzar_proceso_procesador(indice_tabla, getElementoN(patrones, i), nombre_fichero);
     indice_tabla++;
