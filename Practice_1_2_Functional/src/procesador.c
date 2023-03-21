@@ -7,6 +7,7 @@
 
 void procesador(const char *nombre_fichero, const char *patron);
 void procesar_linea(char *linea,const char *patron,int nlinea);
+
 int main(int argc, char *argv[])
 {
  
