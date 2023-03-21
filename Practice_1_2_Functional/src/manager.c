@@ -10,7 +10,7 @@
 #include <definitions.h>
 
 void procesar_argumentos(int argc, char *argv[], char **filename, char **pattern, int *lines);
-void instalar_manejador_senhal();
+void instalar_manejador_senhal(); // Crea un manejador de señal para la señal SIGINT (Ctrl + c), si hay algun error finaliza la ejecucion
 void manejador_senhal(int sign);  // Termina los procesos y libera la memoria
 void procesar_patrones(const char *fichero_patrones); // Comprueba que el fichero de patrones sea accesible
 void procesar_linea(char *linea); // Corta cada patron y lo aniade en una lista enlazada
@@ -50,7 +50,7 @@ int main(int argc, char *argv[])
 
   liberar_recursos(); // Se liberan los recursos destinados a la tabla y a los patrones
 
-  return EXIT_SUCCESS;
+  return EXIT_SUCCESS;  // Finaliza la ejecucion
 }
 
 void procesar_argumentos(int argc, char *argv[], char **nombrefichero, char **fichero_patrones, int *lineas)  // Controla que los argumentos sean correctos y cuenta lineas del fichero principal
@@ -58,22 +58,22 @@ void procesar_argumentos(int argc, char *argv[], char **nombrefichero, char **fi
   FILE *fp;
   int ch;
 
-  if (argc != 3)
+  if (argc != 3)  // Si el numero de argumentos es distinto de los esperados, muestra mensaje y finaliza la ejecucion
   {
     fprintf(stderr, "Error. Usa: ./exec/manager <fichero> <fichero_patrones>.\n");
     exit(EXIT_FAILURE);
   }
 
-  *nombrefichero = argv[1];
-  *fichero_patrones = argv[2];
+  *nombrefichero = argv[1]; // Asigna las rutas de los ficheros
+  *fichero_patrones = argv[2];  // Asigna las rutas de los ficheros
 
-  if ((fp = fopen(*nombrefichero, "r")) == NULL)
+  if ((fp = fopen(*nombrefichero, "r")) == NULL)  // Si no se puede abrir el fichero en modo lectura imprime error y finaliza la ejecucion
   {
     fprintf(stderr, "Error al abrir el fichero %s\n", *nombrefichero);
     exit(EXIT_FAILURE);
   }
 
-  while ((ch = fgetc(fp)) != EOF)
+  while ((ch = fgetc(fp)) != EOF) // Busca "\n" (saltos de linea) en el documento para contar las lineas, finaliza cuando llega al final del fichero (EOF)
   {
     if (ch == '\n')
     {
@@ -106,13 +106,13 @@ void procesar_patrones(const char *fichero_patrones)  // Comprueba que el ficher
   FILE *fp;
   char linea[PATH_MAX];
 
-  if ((fp = fopen(fichero_patrones, "r")) == NULL)  // Intenta abrir en modo lectura
+  if ((fp = fopen(fichero_patrones, "r")) == NULL)  // Intenta abrir en modo lectura, si no se puede muestra error y finaliza la ejecucion
   {
     fprintf(stderr, "Error al abrir el fichero %s\n", fichero_patrones);
     exit(EXIT_FAILURE);
   }
 
-  while (fgets(linea, sizeof(linea), fp) != NULL)
+  while (fgets(linea, sizeof(linea), fp) != NULL) // Mientras haya lineas que busque patrones en ellas
   {
     
     procesar_linea(linea);
@@ -121,7 +121,7 @@ void procesar_patrones(const char *fichero_patrones)  // Comprueba que el ficher
   fclose(fp);
 }
 
-void procesar_linea(char *linea)  // Corta cada patron a buscar y lo inserta en una lista enlazada
+void procesar_linea(char *linea)  // Corta cada patron (usando " " como delimitadores) a buscar y lo inserta en una lista enlazada
 {
   char *token;
 
