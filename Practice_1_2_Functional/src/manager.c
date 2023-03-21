@@ -32,7 +32,7 @@ int main(int argc, char *argv[])
   int lineas = 0;
   patrones = malloc(sizeof(TLista));  // Reserva espacio en memoria para la lista de patrones
 
-  crear(patrones, "PATRONES");  // Crea una lista enlazada en la que el primero elemento contiene el valor "PATRONES"
+  crearLista(patrones, "PATRONES");  // Crea una lista enlazada en la que el primero elemento contiene el valor "PATRONES"
 
   procesar_argumentos(argc, argv, &nombre_fichero, &fichero_patrones, &lineas); // Controla que los argumentos sean correctos y cuenta lineas del fichero principal
 
@@ -257,7 +257,7 @@ void esperar_procesos() // Espera a que terminen los procesos para eliminarlos d
 void liberar_recursos() // Se liberan los recursos destinados a la tabla y a los patrones
 {
   free(g_process_table);
-  destruir(patrones);
+  destruirLista(patrones);
 }
 
 void terminar_procesos(void)  // Termina procesos mediante kill()

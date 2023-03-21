@@ -4,30 +4,30 @@
 #include <string.h>
 
 // Crea una lista con un nodo.
-void crear(TLista *pLista, char *clase)
+void crearLista(TLista *pLista, char *clase)
 {
-  pLista->pPrimero = malloc(sizeof(TNodo));
-  strcpy(pLista->pPrimero->clase ,clase); 
-  pLista->pPrimero->pSiguiente=NULL;
+  pLista->pPrimero = malloc(sizeof(TNodo)); // Se reserva espacio en memoria
+  strcpy(pLista->pPrimero->clase ,clase); // Copia clase en pPrimero
+  pLista->pPrimero->pSiguiente=NULL;  // Apunto el pSiguiente a NULL
 }
 
-void destruir(TLista *pLista)
+void destruirLista(TLista *pLista) // Recorre la lista nodo a nodo y la vacia, al acabar libera la memoria de la lista
 {
-  TNodo *pAux1;
-  struct TProcess_t *pAux2;
+  TNodo *aux1;
+  struct TProcess_t *aux2;
 
-  for (pAux1 = pLista->pPrimero; pAux1 != NULL;)
+  for (aux1 = pLista->pPrimero; aux1 != NULL;)
   {
-    pAux2 = pAux1->pSiguiente;
-    free(pAux1);
-    pAux1 = pAux2;
+    aux2 = aux1->pSiguiente;
+    free(aux1);
+    aux1 = aux2;
   }
 
   free(pLista);
 }
 
 // Inserta al ppio de la lista.
-void insertar(TLista *pLista, char *clase)
+void insertPpioLista(TLista *pLista, char *clase)
 {
  TNodo *pAux1;
  struct TProcess_t *pAux2;

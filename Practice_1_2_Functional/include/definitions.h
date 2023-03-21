@@ -18,11 +18,11 @@ typedef struct
 
 // metodos que utilizan lista.c para los procesos
 ////////////////////////////////////////////////////////////
-void crear(TLista *pLista, char *clase);
-void destruir(TLista *pLista);
+void crearLista(TLista *pLista, char *clase);
+void destruirLista(TLista *pLista);
 
 // 'insertar' inserta al ppio de la lista.
-void insertar(TLista *pLista, char *clase);
+void insertPpioLista(TLista *pLista, char *clase);
 void insertarFinal(TLista *pLista, char *clase);
 void insertarN(TLista *pLista, int index, char *clase);
 
