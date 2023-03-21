@@ -27,6 +27,81 @@
                 "ignoreFailures": true
             }
         ]
+    },
+
+    {
+        "name": "Contador",
+        "type": "cppdbg",
+        "request": "launch",
+        "program": "${workspaceFolder}/exec/contador",
+        "args": ["data/solution.txt","data/patrones.txt"],
+        "stopAtEntry": false,
+        "cwd": "${workspaceFolder}",
+        "environment": [],
+        "externalConsole": false,
+        "MIMode": "gdb",
+        "setupCommands": [
+            {
+                "description": "Habilitar la impresión con sangría para gdb",
+                "text": "-enable-pretty-printing",
+                "ignoreFailures": true
+            },
+            {
+                "description": "Establecer tipo de desensamblado en Intel",
+                "text": "-gdb-set disassembly-flavor intel",
+                "ignoreFailures": true
+            }
+        ]
+    },
+
+    {
+        "name": "Lista",
+        "type": "cppdbg",
+        "request": "launch",
+        "program": "${workspaceFolder}/exec/lista",
+        "args": ["data/solution.txt","data/patrones.txt"],
+        "stopAtEntry": false,
+        "cwd": "${workspaceFolder}",
+        "environment": [],
+        "externalConsole": false,
+        "MIMode": "gdb",
+        "setupCommands": [
+            {
+                "description": "Habilitar la impresión con sangría para gdb",
+                "text": "-enable-pretty-printing",
+                "ignoreFailures": true
+            },
+            {
+                "description": "Establecer tipo de desensamblado en Intel",
+                "text": "-gdb-set disassembly-flavor intel",
+                "ignoreFailures": true
+            }
+        ]
+    },
+
+    {
+        "name": "Procesador",
+        "type": "cppdbg",
+        "request": "launch",
+        "program": "${workspaceFolder}/exec/procesador",
+        "args": ["data/solution.txt","data/patrones.txt"],
+        "stopAtEntry": false,
+        "cwd": "${workspaceFolder}",
+        "environment": [],
+        "externalConsole": false,
+        "MIMode": "gdb",
+        "setupCommands": [
+            {
+                "description": "Habilitar la impresión con sangría para gdb",
+                "text": "-enable-pretty-printing",
+                "ignoreFailures": true
+            },
+            {
+                "description": "Establecer tipo de desensamblado en Intel",
+                "text": "-gdb-set disassembly-flavor intel",
+                "ignoreFailures": true
+            }
+        ]
     }
     ]
 }

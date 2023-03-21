@@ -2,18 +2,18 @@
 #include <stdio.h>
 #include <unistd.h>
 
-void contar(char *line,  int line_number);
+void contarElementos(char *line,  int line_number);
 
 int main(int argc, char *argv[])
 {
-int numero_linea=strtol(argv[2], NULL, 10);
+int numLinea=strtol(argv[2], NULL, 10); // Crea un long con 
   
-  contar(argv[1],numero_linea);
+  contarElementos(argv[1],numLinea);
 
   return EXIT_SUCCESS;
 }
 
-void contar(char *linea, int numero_linea)
+void contarElementos(char *linea, int numero_linea)
 {
   
   int n_palabras = 0, dentro_palabra = 0;
