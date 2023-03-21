@@ -158,13 +158,13 @@ void crear_procesos(const char *nombre_fichero) // Se lanza un proceso contador 
   char linea[PATH_MAX], numero_linea_str[3];
   int indice_tabla = 0;
   
-  if ((fp = fopen(nombre_fichero, "r")) == NULL)
+  if ((fp = fopen(nombre_fichero, "r")) == NULL)  // Intenta abrir en modo lectura, si no se puede muestra error y finaliza la ejecucion
   {
     fprintf(stderr, "Error al abrir el fichero %s\n", nombre_fichero);
     exit(EXIT_FAILURE);
   }
 
-  while (fgets(linea, sizeof(linea), fp) != NULL)
+  while (fgets(linea, sizeof(linea), fp) != NULL) // Mientras detecte lineas crea procesos contadores y actualiza indice de tabla para ir recorriendola
   {
     sprintf(numero_linea_str, "%d", indice_tabla);
     lanzar_proceso_contador(indice_tabla, linea, numero_linea_str);
@@ -190,7 +190,7 @@ void lanzar_proceso_contador(const int indice_tabla, const char *linea, const ch
 {
   pid_t pid;
 
-  switch (pid = fork())
+  switch (pid = fork()) // En funcion del codigo que se  obtenga del proceso entra a -1 (error) o a 0 (success)
   {
   case -1:
     fprintf(stderr, "[MANAGER] Error al lanzar proceso contador: %s.\n", strerror(errno));
@@ -199,7 +199,7 @@ void lanzar_proceso_contador(const int indice_tabla, const char *linea, const ch
     exit(EXIT_FAILURE);
   case 0:
   
-    if (execl(RUTA_CONTADOR, CLASE_CONTADOR, linea, numero_linea_str, NULL) == -1)
+    if (execl(RUTA_CONTADOR, CLASE_CONTADOR, linea, numero_linea_str, NULL) == -1)  // Si en execl detectamos error, mostramos mensaje y finalizamos ejecucion
     {
       fprintf(stderr, "[MANAGER] Error usando execl() en el poceso %s: %s.\n", CLASE_CONTADOR, strerror(errno));
       exit(EXIT_FAILURE);
@@ -238,12 +238,12 @@ void esperar_procesos() // Espera a que terminen los procesos para eliminarlos d
   int i, n_processes = g_nProcesses;
   pid_t pid;
 
-  while (n_processes > 0)
+  while (n_processes > 0) // Mientras que el numero de procesos sea mayor que 0 esperamos a que vayan terminando
   {
     pid = wait(NULL);
     for (i = 0; i < g_nProcesses; i++)
     {
-      if (pid == g_process_table[i].pid)
+      if (pid == g_process_table[i].pid)  // Va actualizando la tabla con 0 en las casillas
       {
         printf("[MANAGER] Proceso %s terminado [%d]...\n", g_process_table[i].clase, g_process_table[i].pid);
         g_process_table[i].pid = 0;
