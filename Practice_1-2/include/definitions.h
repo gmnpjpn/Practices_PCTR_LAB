@@ -32,6 +32,6 @@ void eliminarN(TLista *pLista, int index);
 
 char *getElementoN(TLista *pLista, int index);
 
-void imprimir(TLista *pLista);
-int longitud(TLista *pLista);
+void imprimirLista(TLista *pLista);
+int longitudLista(TLista *pLista);
 ////////////////////////////////////////////////////////////

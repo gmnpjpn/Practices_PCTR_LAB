@@ -161,7 +161,7 @@ char *getElementoN(TLista *pLista, int index) // Obtiene el nodo de la posicion 
   return 0;
 }
 
-void imprimir(TLista *pLista) // Recorre la lista e imprime el valor junto a su posicion
+void imprimirLista(TLista *pLista) // Recorre la lista e imprime el valor junto a su posicion
 {
   TNodo *pAux1;
   struct TProcess_t *pAux2;
@@ -176,7 +176,7 @@ int i;
   }
 }
 
-int longitud(TLista *pLista)  // Recorre la lista incrementando un contador cada vez que encuentra elementos
+int longitudLista(TLista *pLista)  // Recorre la lista incrementando un contador cada vez que encuentra elementos
 {
   TNodo *pAux1;
   struct TProcess_t *pAux2;
@@ -189,6 +189,5 @@ int i=0;
     pAux1 = pAux2;
     i++;
   }
-  
   return i;
 }

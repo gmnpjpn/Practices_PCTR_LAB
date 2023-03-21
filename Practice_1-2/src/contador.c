@@ -25,7 +25,6 @@ void contarElementos(char *linea, int numLinea) // Detecta si esta dentro o fuer
   {
     switch (*iteracion)
     {
-
     case '\r':  // En caso de que encuentre un retorno de carro
       if (dentroPalabra)  // Si dentroPalabra esta a 1 (true) cuenta la palabra, pone a 0 dentroPalabra y continua ejecutando
       {
@@ -33,9 +32,11 @@ void contarElementos(char *linea, int numLinea) // Detecta si esta dentro o fuer
         numPalabras++;
       }
       break;  // Obliga a volver al do while
+      
     default:
       dentroPalabra = true;
     }
+
   } while (*iteracion++); // Mientras haya iteraciones posteriores se continua ejecutando
 
   printf("[CONTADOR %d] La linea '%d' tiene %d palabras\n", getpid(), numLinea, numPalabras);

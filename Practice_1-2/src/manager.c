@@ -40,7 +40,7 @@ int main(int argc, char *argv[])
 
   procesar_patrones(fichero_patrones);  // Comprueba que el fichero de patrones sea accesible
 
-  iniciar_tabla_procesos(lineas, longitud(patrones) - 1); // Se crea una tabla que almacenara los PIDs de la cantidad necesaria de procesos
+  iniciar_tabla_procesos(lineas, longitudLista(patrones) - 1); // Se crea una tabla que almacenara los PIDs de la cantidad necesaria de procesos
 
   crear_procesos(nombre_fichero); // Se cuenta el numero de concidencias por linea, se imprime y se aniaden los procesos a la tabla
 
@@ -172,7 +172,7 @@ void crear_procesos(const char *nombre_fichero) // Se lanza un proceso contador 
     indice_tabla++;
   }
 
-  for (int i = 2; i <= longitud(patrones); i++)
+  for (int i = 2; i <= longitudLista(patrones); i++)
   {
   
     lanzar_proceso_procesador(indice_tabla, getElementoN(patrones, i), nombre_fichero);
