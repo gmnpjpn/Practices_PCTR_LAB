@@ -26,8 +26,9 @@ void destruirLista(TLista *pLista) // Recorre la lista nodo a nodo y la vacia, a
   free(pLista);
 }
 
-// Inserta al ppio de la lista.
-void insertPpioLista(TLista *pLista, char *clase)
+void insertPpioLista(TLista *pLista, char *clase) // Inserta un nodo al principio de la lista
+                                                  // Se desplazan los valores de los nodos a los auxiliares para introducir
+                                                  // la clase que pasemos al inicio
 {
  TNodo *pAux1;
  struct TProcess_t *pAux2;
@@ -43,7 +44,8 @@ void insertPpioLista(TLista *pLista, char *clase)
   pAux1->pSiguiente=pAux2;
 }
 
-void insertarFinal(TLista *pLista, char *clase)
+void insertarFinal(TLista *pLista, char *clase) // Recorre  la lista hasta llegar al final (busca el pSiguiente que apunte a NULL),
+                                                // Introduce la clase al final y deja de recorrer
 {
   struct TProcess_t *pAux1;
   struct TProcess_t *pAux2;
@@ -65,7 +67,8 @@ pAux1->pSiguiente= malloc(sizeof(TNodo));
 }
 
 // Suponemos n = 1, 2, ...
-void insertarN(TLista *pLista, int index, char *clase)
+void insertarN(TLista *pLista, int index, char *clase)   // Se recorre la lista buscando el index deseado con i, se comprueba
+                                                         // que sea una posicion valida e introduce la clase, si lo es
 {
   TNodo *pAux1;
   struct TProcess_t *pAux2;
@@ -90,7 +93,6 @@ pAux1 = pLista->pPrimero;
   
 }
 
-// Elimina el ultimo elemento de la lista.
 void eliminar(TLista *pLista)
 {
   TNodo *pAux1;

@@ -7,7 +7,7 @@ void contarElementos(char *line,  int line_number);
 
 int main(int argc, char *argv[])
 {
-int numLinea=strtol(argv[2], NULL, 10); // Crea un long con el numero de linea en el que se encuentra
+int numLinea=strtol(argv[2], NULL, 10); // Crea un int con el numero de linea en el que se encuentra
   
   contarElementos(argv[1],numLinea);
 

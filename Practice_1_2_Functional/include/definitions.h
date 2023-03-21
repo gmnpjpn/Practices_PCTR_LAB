@@ -2,7 +2,7 @@
 #define RUTA_PROCESADOR "./exec/procesador"
 #define CLASE_CONTADOR "CONTADOR"
 #define RUTA_CONTADOR "./exec/contador"
-#define PATH_MAX 4096 // No sabemos muy bien para que se usa pero sin aniadirlo da error 
+#define PATH_MAX 4096 // Tamanio max de un path (para evitar desbordamientos)
 
 typedef struct TProcess_t // Estructura para los procesos
 {
