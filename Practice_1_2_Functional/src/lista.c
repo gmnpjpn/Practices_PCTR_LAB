@@ -2,13 +2,13 @@
 #include <stdlib.h>
 #include <definitions.h>
 #include <string.h>
+
 // Crea una lista con un nodo.
 void crear(TLista *pLista, char *clase)
 {
   pLista->pPrimero = malloc(sizeof(TNodo));
   strcpy(pLista->pPrimero->clase ,clase); 
   pLista->pPrimero->pSiguiente=NULL;
-   
 }
 
 void destruir(TLista *pLista)
@@ -41,11 +41,6 @@ void insertar(TLista *pLista, char *clase)
   pLista->pPrimero=pAux3;
   pAux3->pSiguiente=pAux1;
   pAux1->pSiguiente=pAux2;
-  
-
-
-
-  
 }
 
 void insertarFinal(TLista *pLista, char *clase)
@@ -67,14 +62,6 @@ pAux1->pSiguiente= malloc(sizeof(TNodo));
     pAux1=pAux2;
     
     }while(pAux1!=NULL);
-
-    
-  
-  
-   
-    
-    
-  
 }
 
 // Suponemos n = 1, 2, ...
@@ -98,9 +85,7 @@ pAux1 = pLista->pPrimero;
       printf("No se ha podido meter el valor ya que no existe el nodo %d \n",i);
     }
     pAux1 = pAux2;
-   
-    
-   
+
   }while(pAux2!=NULL);
   
 }
@@ -126,8 +111,6 @@ pAux1->pSiguiente=NULL;
     pAux1=pAux2;
     
     }while(pAux1!=NULL);
- 
-    
 }
 
 
@@ -153,8 +136,6 @@ pAux3=pAux2->pSiguiente;
     }
     pAux1 = pAux2;
     
-
-   
   }while(pAux2!=NULL);
 }
 
@@ -176,7 +157,6 @@ return pAux1->clase;
     
    i++;
   }
-  
 
   return 0;
 }
@@ -194,8 +174,6 @@ int i;
     pAux1 = pAux2;
     
   }
-
-
 }
 
 
