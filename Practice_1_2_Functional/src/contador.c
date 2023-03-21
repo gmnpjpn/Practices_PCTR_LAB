@@ -1,5 +1,7 @@
 #include <stdlib.h>
 #include <stdio.h>
+#include <unistd.h>
+
 void contar(char *line,  int line_number);
 
 int main(int argc, char *argv[])

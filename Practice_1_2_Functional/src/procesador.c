@@ -2,6 +2,8 @@
 #include <string.h>
 #include <stdio.h>
 #include <linux/limits.h>
+#include <unistd.h>
+
 
 void procesador(const char *nombre_fichero, const char *patron);
 void procesar_linea(char *linea,const char *patron,int nlinea);
