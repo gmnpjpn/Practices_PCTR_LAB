@@ -69,6 +69,7 @@ pAux1->pSiguiente= malloc(sizeof(TNodo));
 // Suponemos n = 1, 2, ...
 void insertarN(TLista *pLista, int index, char *clase)   // Se recorre la lista buscando el index deseado con i, se comprueba
                                                          // que sea una posicion valida e introduce la clase, si lo es
+                                                         // Si no es valida muestra un error
 {
   TNodo *pAux1;
   struct TProcess_t *pAux2;
@@ -93,71 +94,68 @@ pAux1 = pLista->pPrimero;
   
 }
 
-void eliminar(TLista *pLista)
+void eliminarPrimero(TLista *pLista) // Elimina el primer elemento de la lista
 {
-  TNodo *pAux1;
-  struct TProcess_t *pAux2;
-  pAux1 = pLista->pPrimero; 
- 
-  do{
-     
-    pAux2=pAux1->pSiguiente;
-   
-   if(pAux2->pSiguiente==NULL){
-     
-     free(pAux2);
-
-pAux1->pSiguiente=NULL;
-   break;
-    }
-    pAux1=pAux2;
-    
-    }while(pAux1!=NULL);
-}
-
-
-void eliminarN(TLista *pLista, int index)
-{
-  TNodo *pAux1;
-  struct TProcess_t *pAux2;
-  struct TProcess_t *pAux3;
-  
-  int i=1;
-   pAux1 = pLista->pPrimero;
-   
-   do{
-    i++;
-    pAux2 = pAux1->pSiguiente;
-    if(i==index){
-
-pAux3=pAux2->pSiguiente;
-      free(pAux2);
-      
-      pAux1->pSiguiente=pAux3;
-    
-    }
-    pAux1 = pAux2;
-    
-  }while(pAux2!=NULL);
-}
-
-char *getElementoN(TLista *pLista, int index)
-{
-  TNodo *pAux1;
-  struct TProcess_t *pAux2;
-int i=1;
-
-  for(pAux1 = pLista->pPrimero; pAux1 != NULL;)
+  //Con el if, evito "eliminar" algo de una lista vacia
+  if (pLista->pPrimero != NULL)
   {
-    
-    pAux2 = pAux1->pSiguiente;
-    if(index==i){
-return pAux1->clase;
+    // Uso nodoEliminar como un aux para copiar datos y sobreescribir pPrimero
+    TNodo *nodoEliminar = pLista->pPrimero;
+    pLista->pPrimero = nodoEliminar->pSiguiente;
+    free(nodoEliminar);
+  }
+}
 
-     }
-    pAux1 = pAux2;
-    
-   i++;
+
+void eliminarN(TLista *pLista, int index) // Eliminar el nodo de la posicion "index" que le paso
+{
+  if (pLista->pPrimero != NULL) // Entro si la lista contiene algo
+  {
+    if (index == 0) // En caso de que se quiera borrar el primer elemento
+    {
+      TNodo *nodoEliminar = pLista->pPrimero;
+      pLista->pPrimero = nodoEliminar->pSiguiente;
+      free(nodoEliminar);
+    }
+  
+    else  // En caso de que se quiera borrar cualquier elemento que no sea el primero
+    {
+      TNodo *nodoAnterior = pLista->pPrimero;
+      int i;
+
+      for (i = 0; i < (index-1); i++)
+      {
+        nodoAnterior = nodoAnterior->pSiguiente;
+      }
+
+      if (i == (index-1) && nodoAnterior->pSiguiente != NULL)
+      {
+        TNodo *nodoEliminar = nodoAnterior->pSiguiente;
+        nodoAnterior->pSiguiente = nodoEliminar->pSiguiente;
+
+        free(nodoEliminar);
+      }
+    }
+  }
+}
+
+char *getElementoN(TLista *pLista, int index) // Obtiene el nodo de la posicion "index" que le paso
+{
+  if (pLista->pPrimero != NULL) // Entro si la lista contiene algo
+  {
+    TNodo *nodoActual = pLista->pPrimero;
+    int i;
+
+    for (i = 0; i < index && nodoActual != NULL; i++) // Recorre la lista buscando la posicion anterior al "index" y hace "get" del "pSiguiente" del nodo anterior a "index"
+    {
+      nodoActual = nodoActual->pSiguiente;
+    }
+
+    if (i == index)
+    {
+      // printf("El elemento %d de la lista es: %s\n", index, nodoActual->valor);
+      return nodoActual->clase;
+    }
   }
 
   return 0;

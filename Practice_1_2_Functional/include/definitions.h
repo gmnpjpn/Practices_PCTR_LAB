@@ -27,7 +27,7 @@ void insertarFinal(TLista *pLista, char *clase);
 void insertarN(TLista *pLista, int index, char *clase);
 
 // 'elimina' elimina el último de la lista.
-void eliminar(TLista *pLista);
+void eliminarPrimero(TLista *pLista);
 void eliminarN(TLista *pLista, int index);
 
 char *getElementoN(TLista *pLista, int index);
