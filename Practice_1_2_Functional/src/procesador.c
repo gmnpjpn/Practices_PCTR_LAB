@@ -2,7 +2,7 @@
 #include <string.h>
 #include <stdio.h>
 #include <linux/limits.h>
-#include <unistd.h>
+#include <unistd.h> // Incluido para evitar warnings
 
 
 void procesador(const char *nombre_fichero, const char *patron);

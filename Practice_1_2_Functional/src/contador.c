@@ -1,7 +1,7 @@
 #include <stdlib.h>
 #include <stdio.h>
-#include <unistd.h>
-#include <stdbool.h>
+#include <unistd.h> // Incluido para evitar warnings
+#include <stdbool.h>  // Permite el uso de booleanos
 
 void contarElementos(char *line,  int line_number);
 
