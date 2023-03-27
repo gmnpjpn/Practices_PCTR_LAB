@@ -21,7 +21,7 @@ void crear_procesos(int numTelefonos, int numLineas);
 void lanzar_proceso_telefono(const int indice_tabla);
 void lanzar_proceso_linea(const int indice_tabla);
 void esperar_procesos();
-void terminar_procesos(void);
+void terminar_procesos(void); //Creo que el void se ha colado
 void terminar_procesos_especificos(struct TProcess_t *process_table, int process_num);
 void liberar_recursos();
 
