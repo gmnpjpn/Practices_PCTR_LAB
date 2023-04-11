@@ -21,7 +21,7 @@ void crear_procesos(int numTelefonos, int numLineas);
 void lanzar_proceso_telefono(const int indice_tabla);
 void lanzar_proceso_linea(const int indice_tabla);
 void esperar_procesos();
-void terminar_procesos(void); //Creo que el void se ha colado
+void terminar_procesos();
 void terminar_procesos_especificos(struct TProcess_t *process_table, int process_num);
 void liberar_recursos();
 
@@ -68,3 +68,66 @@ int main(int argc, char *argv[])
 }
 
 //TODO: Realizar todas las funciones necesarias.
+
+
+// @German: Comprueba que solo se le pasen dos argumentos a manager, sino finaliza la ejecucion.
+void procesar_argumentos(int argc, char *argv[], int *numTelefonos, int *numLineas)
+{
+    if (argc != 3)
+    {
+        fprintf(stderr, "Error. Usa: ./exec/manager <numTelefonos> <numLineas>.\n");
+        exit(EXIT_FAILURE);
+    }
+}
+
+// @German: Crea un manejador de señal para la señal Ctrl + C, si hay algun error finaliza la ejecucion.
+void instalar_manejador_senhal()
+{
+  if (signal(SIGINT, manejador_senhal) == SIG_ERR)
+  {
+    fprintf(stderr, "[MANAGER] Error al instalar el manejador de senhal: %s.\n", strerror(errno));
+    exit(EXIT_FAILURE);
+  }
+}
+
+// @German: Termina los procesos y libera la memoria
+void manejador_senhal(int sign)
+{
+  printf("\n[MANAGER] Terminacion del programa (Ctrl + C).\n");
+  terminar_procesos();
+  liberar_recursos();
+  exit(EXIT_SUCCESS);
+}
+
+void iniciar_tabla_procesos(int n_procesos_telefono, int n_procesos_linea)
+{
+    // @German: Asigno espacio de memoria a las tablas de lineas y telefonos.
+    g_process_lineas_table = malloc(g_lineasProcesses * sizeof(struct TProcess_t));
+    g_process_telefonos_table = malloc(g_telefonosProcesses * sizeof(struct TProcess_t));
+
+    // @German: Lleno las tablas de ceros antes de la asignacion de PIDs "real".
+    for (int i = 0; i <g_lineasProcesses; i++)
+    {
+        g_process_lineas_table[i].pid = 0;
+    }
+
+    for (int i = 0; i <g_telefonosProcesses; i++)
+    {
+        g_process_telefonos_table[i].pid = 0;
+    }
+}
+
+void crear_procesos(int numTelefonos, int numLineas)
+{
+    // @German: TODO
+}
+
+void esperar_procesos()
+{
+    // @German: TODO
+}
+
+void terminar_procesos()
+{
+    // @German: TODO
+}
