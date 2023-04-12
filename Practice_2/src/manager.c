@@ -93,7 +93,7 @@ void instalar_manejador_senhal()
   }
 }
 
-// @German: Termina los procesos y libera la memoria
+// @German: Termina los procesos y libera la memoria.
 void manejador_senhal(int sign)
 {
   printf("\n[MANAGER] Terminacion del programa (Ctrl + C).\n");
@@ -102,21 +102,21 @@ void manejador_senhal(int sign)
   exit(EXIT_SUCCESS);
 }
 
-// @German: Genera tablas de procesos para los telefonos y las lineas.
+// @German: Genero tablas para telefonos y lineas, las lleno de ceros y actualizo variables globales.
 void iniciar_tabla_procesos(int numTelefonos, int numLineas)
 {
-    // @German: Asigno espacio de memoria a las tablas.
     g_process_lineas_table = malloc(numLineas * sizeof(struct TProcess_t));
     g_process_telefonos_table = malloc(numTelefonos * sizeof(struct TProcess_t));
 
-    // @German: Lleno las tablas de ceros antes de la asignacion de PIDs "real".
     for (int i = 0; i <numLineas; i++)
     {
+        g_lineasProcesses++;
         g_process_lineas_table[i].pid = 0;
     }
 
     for (int i = 0; i <numTelefonos; i++)
     {
+        g_telefonosProcesses++;
         g_process_telefonos_table[i].pid = 0;
     }
 }
@@ -135,12 +135,112 @@ void crear_procesos(int numTelefonos, int numLineas)
     }
 }
 
-void esperar_procesos()
+// @German: Lanzar proceso de telefono.
+void lanzar_proceso_telefono(const int indice_tabla)
 {
-    //@German: TODO   
+  pid_t pid;
+
+  switch (pid = fork())
+  {
+  case -1:
+    fprintf(stderr, "[MANAGER] Error al lanzar proceso telefono: %s.\n", strerror(errno));
+    terminar_procesos();
+    liberar_recursos();
+    exit(EXIT_FAILURE);
+  case 0:
+    // @German: No me vendria mal una explicacion de porque usar CLASE, o si funcionaria sin ello.
+    if (execl(RUTA_TELEFONO, CLASE_TELEFONO, NULL) == -1)
+    {
+      fprintf(stderr, "[MANAGER] Error usando execl() en el proceso %s: %s.\n", CLASE_TELEFONO, strerror(errno));
+      exit(EXIT_FAILURE);
+    }
+  }
+
+  g_process_telefonos_table[indice_tabla].pid = pid;
+  strcpy(g_process_telefonos_table[indice_tabla].clase , CLASE_TELEFONO);
 }
 
+// @German: Lanzar proceso de linea.
+void lanzar_proceso_linea(const int indice_tabla)
+{
+  pid_t pid;
+
+  switch (pid = fork())
+  {
+  case -1:
+    fprintf(stderr, "[MANAGER] Error al lanzar proceso linea: %s.\n", strerror(errno));
+    terminar_procesos();
+    liberar_recursos();
+    exit(EXIT_FAILURE);
+  case 0:
+    // @German: No me vendria mal una explicacion de porque usar CLASE, o si funcionaria sin ello.
+    if (execl(RUTA_TELEFONO, CLASE_LINEA, NULL) == -1)
+    {
+      fprintf(stderr, "[MANAGER] Error usando execl() en el proceso %s: %s.\n", CLASE_LINEA, strerror(errno));
+      exit(EXIT_FAILURE);
+    }
+  }
+
+  g_process_lineas_table[indice_tabla].pid = pid;
+  strcpy(g_process_lineas_table[indice_tabla].clase , CLASE_LINEA);
+}
+
+
+
+// @German: Esperamos a que finalicen los procesos de las lineas y los telefonos.
+void esperar_procesos()
+{
+    for (int i = 0; i < g_lineasProcesses; i++)
+    {
+        waitpid(g_process_lineas_table[i].pid, NULL, 0);
+    }
+
+    for (int i = 0; i < g_telefonosProcesses; i++)
+    {
+        waitpid(g_process_telefonos_table[i].pid, NULL, 0);
+    }
+}
+
+// @German: Termina los procesos de las lineas y los telefonos.
 void terminar_procesos()
 {
+    terminar_procesos_especificos(g_process_telefonos_table, g_telefonosProcesses);
+    terminar_procesos_especificos(g_process_lineas_table, g_lineasProcesses);
+}
+
+// @German: Termina procesos del tipo que se le proporione.
+void terminar_procesos_especificos(struct TProcess_t *process_table, int process_num)
+{
+    for (int i = 0; i < process_num; i++)
+    {
+        if (process_table[i].pid != 0)
+        {
+            kill(process_table[i].pid, SIGKILL);
+        }
+    }
+}
+
+void eliminar_sem(char *lineas)
+{
     // @German: TODO
+}
+
+void eliminar_var(char *llamadasEspera)
+{
+    // @German: TODO
+}
+
+
+
+// @German: Libero tablas, semaforos y memoria compartida.
+void liberar_recursos()
+{
+    free(g_process_telefonos_table);
+    free(g_process_lineas_table);
+
+    eliminar_sem(TELEFONOS);
+    eliminar_sem(LINEAS);
+    eliminar_sem(MUTEXESPERA);
+
+    eliminar_var(LLAMADASESPERA);
 }
