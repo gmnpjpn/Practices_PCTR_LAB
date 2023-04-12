@@ -25,6 +25,8 @@ void terminar_procesos();
 void terminar_procesos_especificos(struct TProcess_t *process_table, int process_num);
 void liberar_recursos();
 
+
+// @German: Variables globales (por eso los prefijos g_)
 int g_telefonosProcesses = 0;
 int g_lineasProcesses = 0;
 struct TProcess_t *g_process_telefonos_table;
@@ -67,10 +69,8 @@ int main(int argc, char *argv[])
     return EXIT_SUCCESS;
 }
 
-//TODO: Realizar todas las funciones necesarias.
-
-
-// @German: Comprueba que solo se le pasen dos argumentos a manager, sino finaliza la ejecucion.
+// @German: Comprueba que solo se le pasen dos argumentos y asigna esos argumentos a dos variables.
+// @German: Se usan punteros en vez de los valores directamente porque sino solo se modificarían las variables locales.
 void procesar_argumentos(int argc, char *argv[], int *numTelefonos, int *numLineas)
 {
     if (argc != 3)
@@ -78,6 +78,9 @@ void procesar_argumentos(int argc, char *argv[], int *numTelefonos, int *numLine
         fprintf(stderr, "Error. Usa: ./exec/manager <numTelefonos> <numLineas>.\n");
         exit(EXIT_FAILURE);
     }
+
+    *numTelefonos = atoi(argv[1]);
+    *numLineas = atoi(argv[2]);
 }
 
 // @German: Crea un manejador de señal para la señal Ctrl + C, si hay algun error finaliza la ejecucion.
@@ -99,35 +102,47 @@ void manejador_senhal(int sign)
   exit(EXIT_SUCCESS);
 }
 
-void iniciar_tabla_procesos(int n_procesos_telefono, int n_procesos_linea)
+// @German: Genera tablas de procesos para los telefonos y las lineas.
+void iniciar_tabla_procesos(int numTelefonos, int numLineas)
 {
-    // @German: Asigno espacio de memoria a las tablas de lineas y telefonos.
-    g_process_lineas_table = malloc(g_lineasProcesses * sizeof(struct TProcess_t));
-    g_process_telefonos_table = malloc(g_telefonosProcesses * sizeof(struct TProcess_t));
+    // @German: Asigno espacio de memoria a las tablas.
+    g_process_lineas_table = malloc(numLineas * sizeof(struct TProcess_t));
+    g_process_telefonos_table = malloc(numTelefonos * sizeof(struct TProcess_t));
 
     // @German: Lleno las tablas de ceros antes de la asignacion de PIDs "real".
-    for (int i = 0; i <g_lineasProcesses; i++)
+    for (int i = 0; i <numLineas; i++)
     {
         g_process_lineas_table[i].pid = 0;
     }
 
-    for (int i = 0; i <g_telefonosProcesses; i++)
+    for (int i = 0; i <numTelefonos; i++)
     {
         g_process_telefonos_table[i].pid = 0;
     }
 }
 
+// @German: Lanza la cantidad de procesos especificados en los argumentos de entrada.
 void crear_procesos(int numTelefonos, int numLineas)
 {
-    // @German: TODO
+    for (int i = 0; i < numTelefonos; i++)
+    {
+        lanzar_proceso_telefono(i);
+    }
+
+    for (int i = 0; i < numLineas; i++)
+    {
+        lanzar_proceso_linea(i);
+    }
 }
 
 void esperar_procesos()
 {
-    // @German: TODO
+    //@German: TODO   
 }
 
 void terminar_procesos()
 {
     // @German: TODO
 }
+
+
