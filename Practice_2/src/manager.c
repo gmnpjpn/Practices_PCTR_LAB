@@ -144,5 +144,3 @@ void terminar_procesos()
 {
     // @German: TODO
 }
-
-
