@@ -9,7 +9,7 @@
 #include <sys/types.h>
 
 #include <memoriaI.h>
-
+//saasfsa
 int crear_var(const char *name, int valor)
 {
   int shm_fd;
