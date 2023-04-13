@@ -156,8 +156,9 @@ void lanzar_proceso_telefono(const int indice_tabla)
     }
   }
 
+  // @German: No acabo de entender las tablas.
   g_process_telefonos_table[indice_tabla].pid = pid;
-  strcpy(g_process_telefonos_table[indice_tabla].clase , CLASE_TELEFONO);
+  strcpy(g_process_telefonos_table[indice_tabla].clase , CLASE_TELEFONO); // @German: Me salta segmentation fault.
 }
 
 // @German: Lanzar proceso de linea.
