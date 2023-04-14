@@ -36,8 +36,8 @@ struct TProcess_t *g_process_lineas_table;
 int main(int argc, char *argv[])
 {
     // Define variables locales
-    int numTelefonos;
-    int numLineas;
+    int numTelefonos = 0;
+    int numLineas = 0;
 
     // Procesa los argumentos y los guarda en las dos variables
     procesar_argumentos(argc,argv,&numTelefonos,&numLineas);
@@ -70,7 +70,7 @@ int main(int argc, char *argv[])
 }
 
 // @German: Comprueba que solo se le pasen dos argumentos y asigna esos argumentos a dos variables.
-// @German: Se usan punteros en vez de los valores directamente porque sino solo se modificarían las variables locales.
+// @German: Se usan punteros en vez de los valores directamente porque sino solo se modificarian las variables locales.
 void procesar_argumentos(int argc, char *argv[], int *numTelefonos, int *numLineas)
 {
     if (argc != 3)
@@ -124,15 +124,17 @@ void iniciar_tabla_procesos(int numTelefonos, int numLineas)
 // @German: Lanza la cantidad de procesos especificados en los argumentos de entrada.
 void crear_procesos(int numTelefonos, int numLineas)
 {
-    for (int i = 0; i < numTelefonos; i++)
-    {
-        lanzar_proceso_telefono(i);
-    }
+  printf("[MANAGER] %d procesos %s creados.\n", numTelefonos, CLASE_TELEFONO);
+  for (int i = 0; i < numTelefonos; i++)
+  {
+    lanzar_proceso_telefono(i);
+  }
 
-    for (int i = 0; i < numLineas; i++)
-    {
-        lanzar_proceso_linea(i);
-    }
+  printf("[MANAGER] %d procesos %s creados.\n", numLineas, CLASE_LINEA);
+  for (int i = 0; i < numLineas; i++)
+  {
+    lanzar_proceso_linea(i);
+  }
 }
 
 // @German: Lanzar proceso de telefono.
@@ -148,7 +150,6 @@ void lanzar_proceso_telefono(const int indice_tabla)
     liberar_recursos();
     exit(EXIT_FAILURE);
   case 0:
-    // @German: No me vendria mal una explicacion de porque usar CLASE, o si funcionaria sin ello.
     if (execl(RUTA_TELEFONO, CLASE_TELEFONO, NULL) == -1)
     {
       fprintf(stderr, "[MANAGER] Error usando execl() en el proceso %s: %s.\n", CLASE_TELEFONO, strerror(errno));
@@ -156,9 +157,8 @@ void lanzar_proceso_telefono(const int indice_tabla)
     }
   }
 
-  // @German: No acabo de entender las tablas.
-  g_process_telefonos_table[indice_tabla].pid = pid; // @German: Me salta segmentation fault. (ya no :))
-  g_process_telefonos_table[indice_tabla].clase = CLASE_TELEFONO; // @German: Esto me faltaba.
+  g_process_telefonos_table[indice_tabla].pid = pid;
+  g_process_telefonos_table[indice_tabla].clase = CLASE_TELEFONO;
 }
 
 // @German: Lanzar proceso de linea.
@@ -175,15 +175,15 @@ void lanzar_proceso_linea(const int indice_tabla)
     exit(EXIT_FAILURE);
   case 0:
     // @German: Lo de clase es por convencion.
-    if (execl(RUTA_TELEFONO, CLASE_LINEA, NULL) == -1)
+    if (execl(RUTA_LINEA, CLASE_LINEA, NULL) == -1)
     {
       fprintf(stderr, "[MANAGER] Error usando execl() en el proceso %s: %s.\n", CLASE_LINEA, strerror(errno));
       exit(EXIT_FAILURE);
     }
   }
 
-  g_process_lineas_table[indice_tabla].pid = pid; // @German: Me salta segmentation fault. (ya no :))
-  g_process_lineas_table[indice_tabla].clase = CLASE_LINEA; // @German: Esto me faltaba.
+  g_process_lineas_table[indice_tabla].pid = pid;
+  g_process_lineas_table[indice_tabla].clase = CLASE_LINEA;
 }
 
 

@@ -3,6 +3,8 @@
 #include <unistd.h>
 #include <stdlib.h>
 
+#include <sys/mman.h> // @German: No se si es necesario, lo he usado para el mmap de la variable de memoria compartida.
+
 #include <definitions.h>
 #include <memoriaI.h>
 #include <semaforoI.h>
@@ -12,8 +14,22 @@ int main(int argc,char *argv[]){
 
 	//TODO: Esquema especificado en la práctica.
 	
+    pid_t pid = getpid();
 	
     // Coge semáforos y memoria compartida
+    sem_t* semaforoMutexEspera = crear_sem(MUTEXESPERA,1);
+    sem_t* semaforoTelefonos = crear_sem(TELEFONOS,0);
+    sem_t* semaforoLineas = crear_sem(LINEAS,0);
+
+    // @German: Obtengo el descriptor variable de memoria compartida.
+    int descriptorMemCompartida = obtener_var(LLAMADASESPERA);
+
+    // @German: Mapeo la variable de memoria compartida en la memoria del proceso hijo y apunto al valor.
+    int* punteroValor = mmap(NULL, sizeof(int), PROT_READ | PROT_WRITE, MAP_SHARED, descriptorMemCompartida, 0);
+
+    // @German: Asigno a una variable local el valor de la variable de memoria compartida.
+    int valorEspera = *punteroValor;
+
 
 
     // Realiza una espera entre 1..60 segundos
@@ -21,13 +37,16 @@ int main(int argc,char *argv[]){
     sleep(rand() % 30 + 1);
 
     //Aumenta las llamadas en espera
+    
 
+    // Incrementar variable de memoria compartida
+    modificar_var(LLAMADASESPERA,valorEspera++);
 
     // Espera telefono libre
     printf("Linea [%d] esperando telefono libre...Nº Llamadas en espera: %d\n",pid,valorEspera);
 
     // Lanza la llamada
-    printf("Linea [%d] desviando llamada a un telefono...\n",pid);
+    printf("Linea [DESCONOCIDA] desviando llamada a un telefono...\n");
 
 
     return EXIT_SUCCESS;
