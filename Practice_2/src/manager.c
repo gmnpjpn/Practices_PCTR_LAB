@@ -157,8 +157,8 @@ void lanzar_proceso_telefono(const int indice_tabla)
   }
 
   // @German: No acabo de entender las tablas.
-  g_process_telefonos_table[indice_tabla].pid = pid;
-  strcpy(g_process_telefonos_table[indice_tabla].clase , CLASE_TELEFONO); // @German: Me salta segmentation fault.
+  g_process_telefonos_table[indice_tabla].pid = pid; // @German: Me salta segmentation fault. (ya no :))
+  g_process_telefonos_table[indice_tabla].clase = CLASE_TELEFONO; // @German: Esto me faltaba.
 }
 
 // @German: Lanzar proceso de linea.
@@ -174,7 +174,7 @@ void lanzar_proceso_linea(const int indice_tabla)
     liberar_recursos();
     exit(EXIT_FAILURE);
   case 0:
-    // @German: No me vendria mal una explicacion de porque usar CLASE, o si funcionaria sin ello.
+    // @German: Lo de clase es por convencion.
     if (execl(RUTA_TELEFONO, CLASE_LINEA, NULL) == -1)
     {
       fprintf(stderr, "[MANAGER] Error usando execl() en el proceso %s: %s.\n", CLASE_LINEA, strerror(errno));
@@ -182,8 +182,8 @@ void lanzar_proceso_linea(const int indice_tabla)
     }
   }
 
-  g_process_lineas_table[indice_tabla].pid = pid;
-  strcpy(g_process_lineas_table[indice_tabla].clase , CLASE_LINEA);
+  g_process_lineas_table[indice_tabla].pid = pid; // @German: Me salta segmentation fault. (ya no :))
+  g_process_lineas_table[indice_tabla].clase = CLASE_LINEA; // @German: Esto me faltaba.
 }
 
 
