@@ -40,11 +40,10 @@ int main(int argc,char *argv[]){
 
     // Espera telefono libre
     printf("Linea [%d] esperando telefono libre...Nº Llamadas en espera: %d\n",pid,valorEspera);
+    wait_sem(semaforoTelefonos);
 
     // Lanza la llamada
     printf("Linea [%d] desviando llamada a un telefono...\n", pid);
-    wait_sem(semaforoTelefonos);
-
 
     return EXIT_SUCCESS;
 }
