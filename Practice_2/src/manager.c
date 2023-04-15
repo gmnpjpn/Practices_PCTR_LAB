@@ -35,52 +35,55 @@ struct TProcess_t *g_process_lineas_table;
 
 int main(int argc, char *argv[])
 {
-    // Define variables locales
-    int numTelefonos = 0;
-    int numLineas = 0;
+  // Define variables locales
+  int numTelefonos = 0;
+  int numLineas = 0;
 
-    // Procesa los argumentos y los guarda en las dos variables
-    procesar_argumentos(argc,argv,&numTelefonos,&numLineas);
+  // Procesa los argumentos y los guarda en las dos variables
+  procesar_argumentos(argc,argv,&numTelefonos,&numLineas);
 
-    // Creamos semáforos y memoria compartida
-    crear_sem(MUTEXESPERA,1); crear_sem(TELEFONOS,0);crear_sem(LINEAS,0);
-    crear_var(LLAMADASESPERA,0);  // No hay llamadas en espera
+  // Creamos semáforos y memoria compartida
+  crear_sem(MUTEXESPERA,1); crear_sem(TELEFONOS,0);crear_sem(LINEAS,0);
+  crear_var(LLAMADASESPERA,0);  // No hay llamadas en espera
 
-    // Manejador de Ctrl-C
-    instalar_manejador_senhal();
- 
-    // Crea Tabla para almacenar los pids de los procesos
-    iniciar_tabla_procesos(numTelefonos, numLineas);
+  // Manejador de Ctrl-C
+  instalar_manejador_senhal();
 
-    // Tenemos todo
-    // Lanzamos los procesos
-    crear_procesos(numTelefonos,numLineas);
-  
-    // Esperamos a que finalicen las lineas
-    esperar_procesos();
+  // Crea Tabla para almacenar los pids de los procesos
+  iniciar_tabla_procesos(numTelefonos, numLineas);
 
-    // Matamos los telefonos y cualquier otro proceso restante
-    terminar_procesos();
+  // Tenemos todo
+  // Lanzamos los procesos
+  crear_procesos(numTelefonos,numLineas);
 
-    // Finalizamos Manager
-    printf("\n[MANAGER] Terminacion del programa (todos los procesos terminados).\n");
-    liberar_recursos();
+  // Esperamos a que finalicen las lineas
+  esperar_procesos();
 
-    return EXIT_SUCCESS;
+  // Matamos los telefonos y cualquier otro proceso restante
+  terminar_procesos();
+
+  // Finalizamos Manager
+  printf("\n[MANAGER] Terminacion del programa (todos los procesos terminados).\n");
+  liberar_recursos();
+
+  return EXIT_SUCCESS;        
 }
 
 // @German: Comprueba que solo se le pasen dos argumentos y asigna esos argumentos a dos variables.
 // @German: Se usan punteros en vez de los valores directamente porque sino solo se modificarian las variables locales.
 void procesar_argumentos(int argc, char *argv[], int *numTelefonos, int *numLineas)
 {
-    if (argc != 3)
-    {
-        fprintf(stderr, "Error. Usa: ./exec/manager <numTelefonos> <numLineas>.\n");
-        exit(EXIT_FAILURE);
-    }
+  if (argc != 3)
+  {
+    fprintf(stderr, "Error. Usa: ./exec/manager <numTelefonos> <numLineas>.\n");
+    exit(EXIT_FAILURE);
+  }
 
-    *numTelefonos = atoi(argv[1]);
-    *numLineas = atoi(argv[2]);
+  *numTelefonos = atoi(argv[1]);
+  *numLineas = atoi(argv[2]);
+  
+  g_telefonosProcesses = *numTelefonos;
+  g_lineasProcesses = *numLineas;
 }
 
 // @German: Crea un manejador de señal para la señal Ctrl + C, si hay algun error finaliza la ejecucion.
@@ -99,26 +102,25 @@ void manejador_senhal(int sign)
   printf("\n[MANAGER] Terminacion del programa (Ctrl + C).\n");
   terminar_procesos();
   liberar_recursos();
+  
   exit(EXIT_SUCCESS);
 }
 
 // @German: Genero tablas para telefonos y lineas, las lleno de ceros y actualizo variables globales.
 void iniciar_tabla_procesos(int numTelefonos, int numLineas)
 {
-    g_process_lineas_table = malloc(numLineas * sizeof(struct TProcess_t));
-    g_process_telefonos_table = malloc(numTelefonos * sizeof(struct TProcess_t));
+  g_process_lineas_table = malloc(numLineas * sizeof(struct TProcess_t));
+  g_process_telefonos_table = malloc(numTelefonos * sizeof(struct TProcess_t));
 
-    for (int i = 0; i <numLineas; i++)
-    {
-        g_lineasProcesses++;
-        g_process_lineas_table[i].pid = 0;
-    }
+  for (int i = 0; i <numLineas; i++)
+  {
+    g_process_lineas_table[i].pid = 0;
+  }
 
-    for (int i = 0; i <numTelefonos; i++)
-    {
-        g_telefonosProcesses++;
-        g_process_telefonos_table[i].pid = 0;
-    }
+  for (int i = 0; i <numTelefonos; i++)
+  {
+    g_process_telefonos_table[i].pid = 0;
+  }
 }
 
 // @German: Lanza la cantidad de procesos especificados en los argumentos de entrada.
@@ -188,60 +190,62 @@ void lanzar_proceso_linea(const int indice_tabla)
 
 
 
-// @German: Esperamos a que finalicen los procesos de las lineas y los telefonos.
+// @German: Espera a que terminen las lineas (los telefonos se terminan en terminar_procesos_especificos).
 void esperar_procesos()
 {
+  int nLin_processes = g_lineasProcesses;
+  pid_t pid;
+
+  while (nLin_processes > 0)
+  {
+    pid = wait(NULL);
     for (int i = 0; i < g_lineasProcesses; i++)
     {
-        waitpid(g_process_lineas_table[i].pid, NULL, 0);
+      if (pid == g_process_lineas_table[i].pid)
+      {
+        printf("[MANAGER] Proceso %s terminado [%d]...\n", g_process_lineas_table[i].clase, g_process_lineas_table[i].pid);
+        g_process_lineas_table[i].pid = 0;
+        nLin_processes--;
+        break;
+      }
     }
-
-    for (int i = 0; i < g_telefonosProcesses; i++)
-    {
-        waitpid(g_process_telefonos_table[i].pid, NULL, 0);
-    }
+  }
 }
 
 // @German: Termina los procesos de las lineas y los telefonos.
 void terminar_procesos()
 {
-    terminar_procesos_especificos(g_process_telefonos_table, g_telefonosProcesses);
-    terminar_procesos_especificos(g_process_lineas_table, g_lineasProcesses);
+  terminar_procesos_especificos(g_process_telefonos_table, g_telefonosProcesses);
+  terminar_procesos_especificos(g_process_lineas_table, g_lineasProcesses);
 }
 
 // @German: Termina procesos del tipo que se le proporione.
 void terminar_procesos_especificos(struct TProcess_t *process_table, int process_num)
 {
-    for (int i = 0; i < process_num; i++)
+  for (int i = 0; i < process_num; i++)
+  {
+    if (process_table[i].pid != 0)
     {
-        if (process_table[i].pid != 0)
-        {
-            kill(process_table[i].pid, SIGKILL);
-        }
+      printf("[MANAGER] Terminando proceso %s [%d]...\n", process_table[i].clase, process_table[i].pid);
+      if (kill(process_table[i].pid, SIGINT) == -1)
+      {
+        // @German: Esto ocurre cuando el proceso ya termino.
+        fprintf(stderr, "[MANAGER] Error al usar kill() en proceso %d: %s.\n", process_table[i].pid, strerror(errno));
+      }
     }
+  }
 }
 
-void eliminar_sem(char *lineas)
-{
-    // @German: TODO
-}
-
-void eliminar_var(char *llamadasEspera)
-{
-    // @German: TODO
-}
-
-
-
-// @German: Libero tablas, semaforos y memoria compartida.
+// @German: Libero tablas, semaforos y variable de memoria compartida.
 void liberar_recursos()
 {
-    free(g_process_telefonos_table);
-    free(g_process_lineas_table);
+  printf("[MANAGER] Liberando recursos...\n");
+  free(g_process_telefonos_table);
+  free(g_process_lineas_table);
 
-    eliminar_sem(TELEFONOS);
-    eliminar_sem(LINEAS);
-    eliminar_sem(MUTEXESPERA);
+  destruir_sem(TELEFONOS);
+  destruir_sem(LINEAS);
+  destruir_sem(MUTEXESPERA);
 
-    eliminar_var(LLAMADASESPERA);
+  destruir_var(LLAMADASESPERA);
 }

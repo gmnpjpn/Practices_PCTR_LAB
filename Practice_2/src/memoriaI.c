@@ -89,12 +89,10 @@ void modificar_var(int shm_fd, int valor)
   int *p;
 
   // Mapeo del objeto de memoria compartida.
-  p = mmap(NULL, sizeof(int), PROT_READ | PROT_WRITE,
-           MAP_SHARED, shm_fd, 0);
+  p = mmap(NULL, sizeof(int), PROT_READ | PROT_WRITE, MAP_SHARED, shm_fd, 0);
   if (p == MAP_FAILED)
   {
-    fprintf(stderr, "Error al mapear la variable: %s\n",
-            strerror(errno));
+    fprintf(stderr, "Error al mapear la variable: %s\n", strerror(errno));
     exit(1);
   }
 
@@ -108,12 +106,10 @@ void consultar_var(int shm_fd, int *valor)
   int *p;
 
   // Mapeo del objeto de memoria compartida.
-  p = mmap(NULL, sizeof(int), PROT_READ | PROT_WRITE,
-           MAP_SHARED, shm_fd, 0);
+  p = mmap(NULL, sizeof(int), PROT_READ | PROT_WRITE, MAP_SHARED, shm_fd, 0);
   if (p == MAP_FAILED)
   {
-    fprintf(stderr, "Error al mapear la variable: %s\n",
-            strerror(errno));
+    fprintf(stderr, "Error al mapear la variable: %s\n", strerror(errno));
     exit(1);
   }
 
