@@ -15,6 +15,7 @@ int main(int argc,char *argv[]){
     // Define variables locales
     pid_t pid = getpid();
     int valorEspera;
+    srand(pid);
 	
     // Coge semáforos y memoria compartida
     sem_t* semaforoMutexEspera = get_sem(MUTEXESPERA);
