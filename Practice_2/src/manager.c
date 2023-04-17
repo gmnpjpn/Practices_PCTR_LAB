@@ -81,9 +81,6 @@ void procesar_argumentos(int argc, char *argv[], int *numTelefonos, int *numLine
 
   *numTelefonos = atoi(argv[1]);
   *numLineas = atoi(argv[2]);
-  
-  g_telefonosProcesses = *numTelefonos;
-  g_lineasProcesses = *numLineas;
 }
 
 // @German: Crea un manejador de señal para la señal Ctrl + C, si hay algun error finaliza la ejecucion.
@@ -161,6 +158,7 @@ void lanzar_proceso_telefono(const int indice_tabla)
 
   g_process_telefonos_table[indice_tabla].pid = pid;
   g_process_telefonos_table[indice_tabla].clase = CLASE_TELEFONO;
+  g_telefonosProcesses++;
 }
 
 // @German: Lanzar proceso de linea.
@@ -186,6 +184,7 @@ void lanzar_proceso_linea(const int indice_tabla)
 
   g_process_lineas_table[indice_tabla].pid = pid;
   g_process_lineas_table[indice_tabla].clase = CLASE_LINEA;
+  g_lineasProcesses++;
 }
 
 
