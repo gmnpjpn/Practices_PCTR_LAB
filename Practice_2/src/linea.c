@@ -3,8 +3,6 @@
 #include <unistd.h>
 #include <stdlib.h>
 
-#include <sys/mman.h> // @German: No se si es necesario, lo he usado para el mmap de la variable de memoria compartida.
-
 #include <definitions.h>
 #include <memoriaI.h>
 #include <semaforoI.h>
