@@ -66,6 +66,10 @@ int main(int argc, char *argv[])
 void crear_buzones()
 {
   // @German: TODO
+  
+  // @German: Algo de mq-open(----, O_WRonly | O_creat, S_IWUSR | S_IRUSR, &mq_attrLlamadas)
+
+  // 
 }
 
 
