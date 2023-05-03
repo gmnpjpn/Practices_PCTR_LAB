@@ -177,7 +177,7 @@ void lanzar_proceso_linea(const int indice_tabla)
 
 
 // @German: Espera a que terminen las lineas (los telefonos se terminan en terminar_procesos_especificos).
-void esperar_procesos()
+/* void esperar_procesos()
 {
   int nLin_processes = g_lineasProcesses;
   pid_t pid;
@@ -195,6 +195,17 @@ void esperar_procesos()
         break;
       }
     }
+  }
+} */
+
+// @German: Version alternativa y mas optimizada, propuesta por Paula en el foro.
+void esperar_procesos()
+{
+  int i;
+
+  for (i = 0; i < NUMLINEAS; i++)
+  {
+    waitpid(g_process_lineas_table[i].pid, 0, 0);
   }
 }
 
