@@ -23,6 +23,8 @@ void terminar_procesos(void);
 void terminar_procesos_especificos(struct TProcess_t *process_table, int process_num);
 void liberar_recursos();
 
+void liberar_buzones(); // @German: Creado por mi para liberar los buzones al finalizar la ejecucion.
+
 int g_telefonosProcesses = 0;
 int g_lineasProcesses = 0;
 struct TProcess_t *g_process_telefonos_table;
@@ -59,19 +61,40 @@ int main(int argc, char *argv[])
     printf("\n[MANAGER] Terminacion del programa (todos los procesos terminados).\n");
     liberar_recursos();
 
+    // @German: Esto lo aniado para intentar que no den problemas los buzones al finalizar la ejecucion y volver a iniciarla.
+    liberar_buzones();
+
     return EXIT_SUCCESS;
 }
 
 
 void crear_buzones()
 {
-  // @German: TODO
-  
-  // @German: Algo de mq-open(----, O_WRonly | O_creat, S_IWUSR | S_IRUSR, &mq_attrLlamadas)
+  // Atributos comunes a todos los buzones
+  struct mq_attr attr;
+  attr.mq_maxmsg = 10;
+  attr.mq_msgsize = TAMANO_MENSAJES;
+  attr.mq_flags = 0;
 
-  // 
+  // Crea el buzón para las llamadas
+  qHandlerLlamadas = mq_open("/llamadas", O_CREAT | O_WRONLY, S_IWUSR | S_IRUSR, &attr);
+  if (qHandlerLlamadas == -1) {
+    perror("Error al crear buzón para llamadas");
+    exit(EXIT_FAILURE);
+  }
+
+  // Crea los buzones para las lineas
+  int i;
+  char queue_name[20];
+  for (i = 0; i < NUMLINEAS; i++) {
+    sprintf(queue_name, "/linea%d", i);
+    qHandlerLineas[i] = mq_open(queue_name, O_CREAT | O_RDONLY, S_IWUSR | S_IRUSR, &attr);
+    if (qHandlerLineas[i] == -1) {
+      perror("Error al crear buzón para línea");
+      exit(EXIT_FAILURE);
+    }
+  }
 }
-
 
 // @German: Comprueba que solo se le pasen dos argumentos y asigna esos argumentos a dos variables.
 // @German: Se usan punteros en vez de los valores directamente porque sino solo se modificarian las variables locales.
@@ -235,4 +258,22 @@ void liberar_recursos()
 
   // @German: Imagino que habra que meter algo de los buzones aqui.
   // @German: Dijo en clase algo de que se guardaban los buzones tras cada ejecucion y habria que hacer reset.
+}
+
+void liberar_buzones()
+{
+    // Cerramos los buzones
+    mq_close(qHandlerLlamadas);
+    int i;
+    for (i = 0; i < NUMLINEAS; i++) {
+        mq_close(qHandlerLineas[i]);
+    }
+
+    // Eliminamos los buzones
+    mq_unlink("/llamadas");
+    char queue_name[20];
+    for (i = 0; i < NUMLINEAS; i++) {
+        sprintf(queue_name, "/linea%d", i);
+        mq_unlink(queue_name);
+    }
 }
