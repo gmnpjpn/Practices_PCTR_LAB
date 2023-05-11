@@ -29,7 +29,6 @@ struct TProcess_t *g_process_telefonos_table;
 struct TProcess_t *g_process_lineas_table;
 mqd_t qHandlerLlamadas;
 mqd_t qHandlerLineas[NUMLINEAS];
-
 char queue_name[TAMANO_MENSAJES + 1];
 
 
@@ -67,9 +66,9 @@ int main(int argc, char *argv[])
 
 void crear_buzones()
 {
-  // Atributos comunes a todos los buzones
+  // @German: Atributos comunes a todos los buzones
   struct mq_attr attr;
-  attr.mq_maxmsg = 10;
+  attr.mq_maxmsg = NUMLINEAS;
   attr.mq_msgsize = TAMANO_MENSAJES;
 
   // @German: Creo el buzon para las llamadas
@@ -82,10 +81,9 @@ void crear_buzones()
   // @German: Creo los buzones para las lineas
   int i;
 
-  attr.mq_maxmsg = 1; 
   for (i = 0; i < NUMLINEAS; i++) {
-    sprintf(queue_name, "%s%d", BUZON_LINEAS, i); // @German: Creo el nombre del buzon para la linea i
-    qHandlerLineas[i] = mq_open(queue_name, O_CREAT | O_RDONLY, S_IWUSR | S_IRUSR, &attr);  // @German: Creo el buzon para la linea i
+    sprintf(queue_name, "%s%d", BUZON_LINEAS, i); // @German: Almaceno en queue_name el nombre del buzon para la linea i
+    qHandlerLineas[i] = mq_open(queue_name, O_WRONLY | O_CREAT, S_IWUSR | S_IRUSR, &attr);  // @German: Creo el buzon para la linea i
     if (qHandlerLineas[i] == -1) {
       perror("Error al crear buzón para línea");
       exit(EXIT_FAILURE);
@@ -189,8 +187,8 @@ void lanzar_proceso_linea(const int indice_tabla)
     liberar_recursos();
     exit(EXIT_FAILURE);
   case 0:
-    // @German: Lo de clase es por convencion.
-    if (execl(RUTA_LINEA, CLASE_LINEA, NULL) == -1)
+    sprintf(queue_name, "%s%d", BUZON_LINEAS, indice_tabla);
+    if (execl(RUTA_LINEA, CLASE_LINEA,queue_name, NULL) == -1)
     {
       fprintf(stderr, "[MANAGER] Error usando execl() en el proceso %s: %s.\n", CLASE_LINEA, strerror(errno));
       exit(EXIT_FAILURE);
@@ -204,7 +202,7 @@ void lanzar_proceso_linea(const int indice_tabla)
 
 
 // @German: Espera a que terminen las lineas (los telefonos se terminan en terminar_procesos_especificos).
-void esperar_procesos()
+/* void esperar_procesos()
 {
   int nLin_processes = g_lineasProcesses;
   pid_t pid;
@@ -222,6 +220,15 @@ void esperar_procesos()
         break;
       }
     }
+  }
+} */
+
+// @German: Es una version modificada y mas eficiente de esperar_procesos() subida al foro, la autoria es de Paula Castillejo.
+void esperar_procesos(){
+  int i;
+  for (i = 0; i < NUMLINEAS; i++)
+  {
+    waitpid(g_process_lineas_table[i].pid, 0, 0);
   }
 }
 
