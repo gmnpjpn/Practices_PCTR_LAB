@@ -29,8 +29,31 @@ int main(int argc,char *argv[]){
     }
     sprintf(buzonLinea,"%s",argv[1]);
 
-    //TODO
+    if ((qHandlerLinea = mq_open(buzonLinea, O_RDWR)) == -1)
+    {
+        fprintf(stderr, "Error. No se pudo abrir el buzón de linea. %s\n", strerror(errno));
+    }
+    
+    qHandlerLlamadas = mq_open(BUZON_LLAMADAS, O_RDWR);
 
+    while (1)
+    {
+        printf("Linea %d: Esperando llamada...\n", pid);
+        sleep((rand() % 30) + 1);
+
+        // Envia mensaje de llamada
+        mq_send(qHandlerLlamadas, buzonLinea, sizeof(buzonLinea), 0);
+        printf("Linea %d: Llamada recibida (%s).\n", pid, buzonLinea);
+
+        printf("Linea %d: Esperando a fin de conversacion...\n", pid);
+        if (mq_receive(qHandlerLinea, buffer, sizeof(buffer), 0) == -1)
+        {
+            fprintf(stderr, "Error. No se pudo recibir el mensaje. %s\n", strerror(errno));
+        }
+
+        printf("Linea %d: Fin de conversacion.\n", pid);
+    }
+    
     return EXIT_SUCCESS;
 }
 
