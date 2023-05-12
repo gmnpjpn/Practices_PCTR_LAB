@@ -29,12 +29,11 @@ struct TProcess_t *g_process_telefonos_table;
 struct TProcess_t *g_process_lineas_table;
 mqd_t qHandlerLlamadas;
 mqd_t qHandlerLineas[NUMLINEAS];
+char queue_name[TAMANO_MENSAJES + 1];
 
 
 int main(int argc, char *argv[])
 {
-    // Define variables locales
-
     // Creamos los buzones
     crear_buzones();
 
@@ -65,12 +64,34 @@ int main(int argc, char *argv[])
 
 void crear_buzones()
 {
-  // @German: TODO
+  // @German: Atributos comunes a todos los buzones
+  struct mq_attr attr;
+  attr.mq_maxmsg = NUMLINEAS;
+  attr.mq_msgsize = TAMANO_MENSAJES;
+
+  // @German: Creo el buzon para las llamadas
+  qHandlerLlamadas = mq_open(BUZON_LLAMADAS, O_WRONLY | O_CREAT, S_IWUSR | S_IRUSR, &attr);
+  if (qHandlerLlamadas == -1)
+  {
+    perror("Error al crear buzón para llamadas");
+    exit(EXIT_FAILURE);
+  }
+
+  // @German: Creo los buzones para las lineas
+  int i;
+  for (i = 0; i < NUMLINEAS; i++)
+  {
+    // @German: Almaceno en queue_name el nombre del buzon para la linea i
+    sprintf(queue_name, "%s%d", BUZON_LINEAS, i);
+    qHandlerLineas[i] = mq_open(queue_name, O_WRONLY | O_CREAT, S_IWUSR | S_IRUSR, &attr);  // @German: Creo el buzon para la linea i
+    if (qHandlerLineas[i] == -1)
+    {
+      perror("Error al crear buzón para línea");
+      exit(EXIT_FAILURE);
+    }
+  }
 }
 
-
-// @German: Comprueba que solo se le pasen dos argumentos y asigna esos argumentos a dos variables.
-// @German: Se usan punteros en vez de los valores directamente porque sino solo se modificarian las variables locales.
 void instalar_manejador_senhal()
 {
   if (signal(SIGINT, manejador_senhal) == SIG_ERR)
@@ -80,7 +101,6 @@ void instalar_manejador_senhal()
   }
 }
 
-// @German: Termina los procesos y libera la memoria.
 void manejador_senhal(int sign)
 {
   printf("\n[MANAGER] Terminacion del programa (Ctrl + C).\n");
@@ -91,17 +111,17 @@ void manejador_senhal(int sign)
 }
 
 // @German: Genero tablas para telefonos y lineas, las lleno de ceros y actualizo variables globales.
-void iniciar_tabla_procesos(int numTelefonos, int numLineas)
+void iniciar_tabla_procesos(int n_procesos_telefono, int n_procesos_linea)
 {
-  g_process_lineas_table = malloc(numLineas * sizeof(struct TProcess_t));
-  g_process_telefonos_table = malloc(numTelefonos * sizeof(struct TProcess_t));
+  g_process_lineas_table = malloc(n_procesos_linea * sizeof(struct TProcess_t));
+  g_process_telefonos_table = malloc(n_procesos_telefono * sizeof(struct TProcess_t));
 
-  for (int i = 0; i <numLineas; i++)
+  for (int i = 0; i <n_procesos_linea; i++)
   {
     g_process_lineas_table[i].pid = 0;
   }
 
-  for (int i = 0; i <numTelefonos; i++)
+  for (int i = 0; i <n_procesos_telefono; i++)
   {
     g_process_telefonos_table[i].pid = 0;
   }
@@ -110,17 +130,19 @@ void iniciar_tabla_procesos(int numTelefonos, int numLineas)
 // @German: Lanza la cantidad de procesos especificados en los argumentos de entrada.
 void crear_procesos(int numTelefonos, int numLineas)
 {
-  printf("[MANAGER] %d procesos %s creados.\n", numTelefonos, CLASE_TELEFONO);
   for (int i = 0; i < numTelefonos; i++)
   {
     lanzar_proceso_telefono(i);
   }
+  printf("[MANAGER] %d procesos %s creados.\n", numTelefonos, CLASE_TELEFONO);
 
-  printf("[MANAGER] %d procesos %s creados.\n", numLineas, CLASE_LINEA);
+  sleep(1); // @German: Espero un segundo para que los telefonos se creen antes que las lineas.
+
   for (int i = 0; i < numLineas; i++)
   {
     lanzar_proceso_linea(i);
   }
+  printf("[MANAGER] %d procesos %s creados.\n", numLineas, CLASE_LINEA);
 }
 
 
@@ -136,6 +158,7 @@ void lanzar_proceso_telefono(const int indice_tabla)
     terminar_procesos();
     liberar_recursos();
     exit(EXIT_FAILURE);
+
   case 0:
     if (execl(RUTA_TELEFONO, CLASE_TELEFONO, NULL) == -1)
     {
@@ -146,6 +169,8 @@ void lanzar_proceso_telefono(const int indice_tabla)
 
   g_process_telefonos_table[indice_tabla].pid = pid;
   g_process_telefonos_table[indice_tabla].clase = CLASE_TELEFONO;
+
+  // @German: Actualizo variable global de procesos de telefonos.
   g_telefonosProcesses++;
 }
 
@@ -161,9 +186,10 @@ void lanzar_proceso_linea(const int indice_tabla)
     terminar_procesos();
     liberar_recursos();
     exit(EXIT_FAILURE);
+    
   case 0:
-    // @German: Lo de clase es por convencion.
-    if (execl(RUTA_LINEA, CLASE_LINEA, NULL) == -1)
+    sprintf(queue_name, "%s%d", BUZON_LINEAS, indice_tabla);
+    if (execl(RUTA_LINEA, CLASE_LINEA,queue_name, NULL) == -1)
     {
       fprintf(stderr, "[MANAGER] Error usando execl() en el proceso %s: %s.\n", CLASE_LINEA, strerror(errno));
       exit(EXIT_FAILURE);
@@ -172,6 +198,8 @@ void lanzar_proceso_linea(const int indice_tabla)
 
   g_process_lineas_table[indice_tabla].pid = pid;
   g_process_lineas_table[indice_tabla].clase = CLASE_LINEA;
+
+  // @German: Actualizo variable global de procesos de lineas.
   g_lineasProcesses++;
 }
 
@@ -198,11 +226,9 @@ void lanzar_proceso_linea(const int indice_tabla)
   }
 } */
 
-// @German: Version alternativa y mas optimizada, propuesta por Paula en el foro.
-void esperar_procesos()
-{
+// @German: Es una version modificada y mas eficiente de esperar_procesos() subida al foro, la autoria es de Paula Castillejo.
+void esperar_procesos(){
   int i;
-
   for (i = 0; i < NUMLINEAS; i++)
   {
     waitpid(g_process_lineas_table[i].pid, 0, 0);
@@ -240,6 +266,15 @@ void liberar_recursos()
   free(g_process_telefonos_table);
   free(g_process_lineas_table);
 
-  // @German: Imagino que habra que meter algo de los buzones aqui.
+  for (int i = 0; i < NUMLINEAS; i++)
+  {
+    sprintf(queue_name, "%s%d", BUZON_LINEAS, i);
+    mq_close(qHandlerLineas[i]);
+    mq_unlink(queue_name);
+    mq_unlink(BUZON_LINEAS);
+  }
+  mq_close(qHandlerLlamadas);
+  mq_unlink(BUZON_LLAMADAS);  
+
   // @German: Dijo en clase algo de que se guardaban los buzones tras cada ejecucion y habria que hacer reset.
 }
