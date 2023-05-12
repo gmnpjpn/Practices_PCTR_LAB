@@ -34,8 +34,6 @@ char queue_name[TAMANO_MENSAJES + 1];
 
 int main(int argc, char *argv[])
 {
-    // Define variables locales
-
     // Creamos los buzones
     crear_buzones();
 
@@ -73,26 +71,27 @@ void crear_buzones()
 
   // @German: Creo el buzon para las llamadas
   qHandlerLlamadas = mq_open(BUZON_LLAMADAS, O_WRONLY | O_CREAT, S_IWUSR | S_IRUSR, &attr);
-  if (qHandlerLlamadas == -1) {
+  if (qHandlerLlamadas == -1)
+  {
     perror("Error al crear buzón para llamadas");
     exit(EXIT_FAILURE);
   }
 
   // @German: Creo los buzones para las lineas
   int i;
-
-  for (i = 0; i < NUMLINEAS; i++) {
-    sprintf(queue_name, "%s%d", BUZON_LINEAS, i); // @German: Almaceno en queue_name el nombre del buzon para la linea i
+  for (i = 0; i < NUMLINEAS; i++)
+  {
+    // @German: Almaceno en queue_name el nombre del buzon para la linea i
+    sprintf(queue_name, "%s%d", BUZON_LINEAS, i);
     qHandlerLineas[i] = mq_open(queue_name, O_WRONLY | O_CREAT, S_IWUSR | S_IRUSR, &attr);  // @German: Creo el buzon para la linea i
-    if (qHandlerLineas[i] == -1) {
+    if (qHandlerLineas[i] == -1)
+    {
       perror("Error al crear buzón para línea");
       exit(EXIT_FAILURE);
     }
   }
 }
 
-// @German: Comprueba que solo se le pasen dos argumentos y asigna esos argumentos a dos variables.
-// @German: Se usan punteros en vez de los valores directamente porque sino solo se modificarian las variables locales.
 void instalar_manejador_senhal()
 {
   if (signal(SIGINT, manejador_senhal) == SIG_ERR)
@@ -102,7 +101,6 @@ void instalar_manejador_senhal()
   }
 }
 
-// @German: Termina los procesos y libera la memoria.
 void manejador_senhal(int sign)
 {
   printf("\n[MANAGER] Terminacion del programa (Ctrl + C).\n");
@@ -145,7 +143,6 @@ void crear_procesos(int numTelefonos, int numLineas)
     lanzar_proceso_linea(i);
   }
   printf("[MANAGER] %d procesos %s creados.\n", numLineas, CLASE_LINEA);
-
 }
 
 
@@ -161,6 +158,7 @@ void lanzar_proceso_telefono(const int indice_tabla)
     terminar_procesos();
     liberar_recursos();
     exit(EXIT_FAILURE);
+
   case 0:
     if (execl(RUTA_TELEFONO, CLASE_TELEFONO, NULL) == -1)
     {
@@ -171,6 +169,8 @@ void lanzar_proceso_telefono(const int indice_tabla)
 
   g_process_telefonos_table[indice_tabla].pid = pid;
   g_process_telefonos_table[indice_tabla].clase = CLASE_TELEFONO;
+
+  // @German: Actualizo variable global de procesos de telefonos.
   g_telefonosProcesses++;
 }
 
@@ -186,6 +186,7 @@ void lanzar_proceso_linea(const int indice_tabla)
     terminar_procesos();
     liberar_recursos();
     exit(EXIT_FAILURE);
+    
   case 0:
     sprintf(queue_name, "%s%d", BUZON_LINEAS, indice_tabla);
     if (execl(RUTA_LINEA, CLASE_LINEA,queue_name, NULL) == -1)
@@ -197,6 +198,8 @@ void lanzar_proceso_linea(const int indice_tabla)
 
   g_process_lineas_table[indice_tabla].pid = pid;
   g_process_lineas_table[indice_tabla].clase = CLASE_LINEA;
+
+  // @German: Actualizo variable global de procesos de lineas.
   g_lineasProcesses++;
 }
 

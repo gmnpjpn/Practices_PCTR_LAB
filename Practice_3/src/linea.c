@@ -1,4 +1,3 @@
-
 #include <stdio.h>
 #include <unistd.h>
 #include <stdlib.h>
@@ -16,7 +15,7 @@ int main(int argc,char *argv[]){
     mqd_t qHandlerLlamadas;
     mqd_t qHandlerLinea;
     char buzonLinea[TAMANO_MENSAJES];
-    char buffer[TAMANO_MENSAJES+1];
+    char buffer[TAMANO_MENSAJES+1]; // @German: Si no me equivoco, el +1 es para para el '\0'
 
     // Inicia Random
     srand(pid);
@@ -27,8 +26,11 @@ int main(int argc,char *argv[]){
         fprintf(stderr, "Error. Usa: ./exec/linea <cola_linea_llamante>.\n");
         exit(EXIT_FAILURE);
     }
+
+    // @German: Obtengo el nombre del buzón de la línea
     sprintf(buzonLinea,"%s",argv[1]);
 
+    // @German: Verifico que pueda abrir el buzón de linea.
     if ((qHandlerLinea = mq_open(buzonLinea, O_RDWR)) == -1)
     {
         fprintf(stderr, "Error. No se pudo abrir el buzón de linea. %s\n", strerror(errno));
@@ -56,4 +58,3 @@ int main(int argc,char *argv[]){
     
     return EXIT_SUCCESS;
 }
-
