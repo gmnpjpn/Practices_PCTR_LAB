@@ -111,7 +111,7 @@ void manejador_senhal(int sign)
   exit(EXIT_SUCCESS);
 }
 
-// @German: Genero tablas para telefonos y lineas, las lleno de ceros y actualizo variables globales.
+// @German: Genero tablas para telefonos y lineas, ademas de llenarlas de ceros.
 void iniciar_tabla_procesos(int n_procesos_telefono, int n_procesos_linea)
 {
   g_process_lineas_table = malloc(n_procesos_linea * sizeof(struct TProcess_t));
@@ -204,29 +204,6 @@ void lanzar_proceso_linea(const int indice_tabla)
   g_lineasProcesses++;
 }
 
-
-// @German: Espera a que terminen las lineas (los telefonos se terminan en terminar_procesos_especificos).
-/* void esperar_procesos()
-{
-  int nLin_processes = g_lineasProcesses;
-  pid_t pid;
-
-  while (nLin_processes > 0)
-  {
-    pid = wait(NULL);
-    for (int i = 0; i < g_lineasProcesses; i++)
-    {
-      if (pid == g_process_lineas_table[i].pid)
-      {
-        printf("[MANAGER] Proceso %s terminado [%d]...\n", g_process_lineas_table[i].clase, g_process_lineas_table[i].pid);
-        g_process_lineas_table[i].pid = 0;
-        nLin_processes--;
-        break;
-      }
-    }
-  }
-} */
-
 // @German: Es una version modificada y mas eficiente de esperar_procesos() subida al foro, la autoria es de Paula Castillejo.
 void esperar_procesos(){
   int i;
@@ -260,7 +237,7 @@ void terminar_procesos_especificos(struct TProcess_t *process_table, int process
   }
 }
 
-// @German: Libero tablas, semaforos y variable de memoria compartida.
+// @German: Libero tablas y buzones.
 void liberar_recursos()
 {
   printf("[MANAGER] Liberando recursos...\n");
@@ -276,6 +253,4 @@ void liberar_recursos()
   }
   mq_close(qHandlerLlamadas);
   mq_unlink(BUZON_LLAMADAS);  
-
-  // @German: Dijo en clase algo de que se guardaban los buzones tras cada ejecucion y habria que hacer reset.
 }
