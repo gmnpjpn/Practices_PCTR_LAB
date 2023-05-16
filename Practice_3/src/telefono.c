@@ -25,13 +25,13 @@ int main(int argc,char *argv[]){
 
     while (1)
     {
-        printf("Telefono %d: Esperando llamada...\n", pid);
+        printf("Telefono [%d] en espera...\n", pid);
         if ((mq_receive(qHandlerLlamadas, buffer, sizeof(buffer), NULL)) == -1)
         {
             fprintf(stderr, "Error. No se pudo recibir llamada. %s\n", strerror(errno));
         }
 
-        printf("Telefono %d conversando mediante la linea %s\n", pid, buffer);
+        printf("Telefono [%d] en conversacion de llamada desde la linea: [%s]...\n", pid, buffer);
         sleep((rand() % 10) + 1);
 
         if ((qHandlerLinea = mq_open(buffer, O_RDWR)) == -1)
@@ -39,7 +39,7 @@ int main(int argc,char *argv[]){
             fprintf(stderr, "Error. No se pudo abrir el buzón de linea. %s\n", strerror(errno));
         }
 
-        printf("Telefono %d: Finalizando llamada...\n", pid);
+        printf("Telefono [%d] ha colgado la llamada\n", pid);
         if ((mq_send(qHandlerLinea, buffer, sizeof(buffer), 0)) == -1)
         {
             fprintf(stderr, "Error. No se pudo enviar mensaje. %s\n", strerror(errno));

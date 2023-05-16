@@ -15,7 +15,7 @@ int main(int argc,char *argv[]){
     mqd_t qHandlerLlamadas;
     mqd_t qHandlerLinea;
     char buzonLinea[TAMANO_MENSAJES];
-    char buffer[TAMANO_MENSAJES+1]; // @German: Si no me equivoco, el +1 es para para el '\0'
+    char buffer[TAMANO_MENSAJES+1]; // @German: Si no me equivoco, el +1 es por si hay algun terminador de cadena '/0'.
 
     // Inicia Random
     srand(pid);
@@ -40,7 +40,7 @@ int main(int argc,char *argv[]){
 
     while (1)
     {
-        printf("Linea %d: Esperando llamada...\n", pid);
+        printf("Linea [%d] esperando llamada...\n", pid);
         sleep((rand() % 30) + 1);
 
         // Envia mensaje de llamada
