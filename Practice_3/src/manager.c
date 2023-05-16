@@ -29,7 +29,8 @@ struct TProcess_t *g_process_telefonos_table;
 struct TProcess_t *g_process_lineas_table;
 mqd_t qHandlerLlamadas;
 mqd_t qHandlerLineas[NUMLINEAS];
-char queue_name[TAMANO_MENSAJES + 1];
+char queue_name[TAMANO_MENSAJES + 1]; // @German: Si no me equivoco, el +1 es por si hay algun terminador de cadena '/0'.
+
 
 
 int main(int argc, char *argv[])
